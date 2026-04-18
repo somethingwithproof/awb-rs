@@ -157,7 +157,7 @@ impl CategoryManager {
 
         // Sort categories by name (case-insensitive)
         let mut sorted_cats = categories.clone();
-        sorted_cats.sort_by(|a, b| a.0.to_lowercase().cmp(&b.0.to_lowercase()));
+        sorted_cats.sort_by_key(|a| a.0.to_lowercase());
 
         // If already sorted, return unchanged
         if sorted_cats == categories {
