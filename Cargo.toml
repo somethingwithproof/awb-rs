@@ -47,7 +47,7 @@ reqwest = { version = "0.12", features = ["json", "cookies", "rustls-tls"], defa
 # OAuth
 oauth2 = { version = "5", features = ["reqwest"] }
 hmac = "0.13"
-sha1 = "0.10"
+sha1 = "0.11"
 base64 = "0.22"
 rand = "0.9"
 
