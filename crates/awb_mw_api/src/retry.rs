@@ -58,7 +58,7 @@ impl RetryPolicy {
 fn rand_jitter() -> f64 {
     // Use rand crate for proper randomness
     use rand::Rng;
-    rand::thread_rng().gen_range(0.0..1.0)
+    rand::rng().random_range(0.0..1.0)
 }
 
 #[cfg(test)]

@@ -333,31 +333,35 @@ impl LuaPlugin {
         // Set instruction hook if limit is configured or for cancellation
         let counter = self.instruction_counter.clone();
         let limit = self.config.instruction_limit;
-        self.lua.set_hook(
-            mlua::HookTriggers {
-                every_nth_instruction: Some(1000),
-                ..Default::default()
-            },
-            move |_lua, _debug| {
-                // Check cancellation flag first
-                if cancel_flag.load(std::sync::atomic::Ordering::Relaxed) {
-                    return Err(mlua::Error::RuntimeError(
-                        "Execution cancelled due to timeout".to_string(),
-                    ));
-                }
-
-                // Check instruction limit if configured
-                if let Some(limit) = limit {
-                    let count = counter.fetch_add(1000, std::sync::atomic::Ordering::Relaxed);
-                    if count > limit {
+        self.lua
+            .set_hook(
+                mlua::HookTriggers {
+                    every_nth_instruction: Some(1000),
+                    ..Default::default()
+                },
+                move |_lua, _debug| {
+                    // Check cancellation flag first
+                    if cancel_flag.load(std::sync::atomic::Ordering::Relaxed) {
                         return Err(mlua::Error::RuntimeError(
-                            "Instruction limit exceeded".to_string(),
+                            "Execution cancelled due to timeout".to_string(),
                         ));
                     }
-                }
-                Ok(mlua::VmState::Continue)
-            },
-        );
+
+                    // Check instruction limit if configured
+                    if let Some(limit) = limit {
+                        let count = counter.fetch_add(1000, std::sync::atomic::Ordering::Relaxed);
+                        if count > limit {
+                            return Err(mlua::Error::RuntimeError(
+                                "Instruction limit exceeded".to_string(),
+                            ));
+                        }
+                    }
+                    Ok(mlua::VmState::Continue)
+                },
+            )
+            .map_err(|e| {
+                PluginError::ExecutionFailed(format!("failed to install Lua hook: {}", e))
+            })?;
 
         // Get the transform function
         let globals = self.lua.globals();

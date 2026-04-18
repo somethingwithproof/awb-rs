@@ -1,5 +1,5 @@
 use crate::error::MwApiError;
-use hmac::{Hmac, Mac};
+use hmac::{Hmac, KeyInit, Mac};
 use oauth2::reqwest::async_http_client;
 use oauth2::{
     AuthUrl, AuthorizationCode, ClientId, ClientSecret, CsrfToken, RedirectUrl, RefreshToken,
@@ -293,8 +293,7 @@ pub fn oauth1_sign_request(
 
 /// Generate a random nonce for OAuth 1.0a
 fn generate_nonce() -> String {
-    use rand::Rng;
-    let nonce: u128 = rand::rngs::OsRng.r#gen();
+    let nonce: u128 = rand::random();
     format!("{:x}", nonce)
 }
 
