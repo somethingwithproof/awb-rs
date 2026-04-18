@@ -58,7 +58,7 @@ keyring = { version = "3", features = ["apple-native", "windows-native", "sync-s
 
 # Regex
 regex = "1"
-fancy-regex = "0.14"
+fancy-regex = "0.17"
 
 # Encoding
 percent-encoding = "2"
