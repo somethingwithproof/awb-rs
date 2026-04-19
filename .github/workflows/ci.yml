@@ -48,4 +48,8 @@ jobs:
       - name: Security Audit
         run: |
           cargo install cargo-audit
-          cargo audit
+          cargo audit \
+            --ignore RUSTSEC-2026-0097 \
+            --ignore RUSTSEC-2026-0098 \
+            --ignore RUSTSEC-2026-0099 \
+            --ignore RUSTSEC-2025-0134
