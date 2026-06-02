@@ -64,7 +64,7 @@ fancy-regex = "0.17"
 percent-encoding = "2"
 
 # Diff
-similar = { version = "2", features = ["unicode"] }
+similar = { version = "3", features = ["unicode"] }
 
 # Collections
 indexmap = "2"
