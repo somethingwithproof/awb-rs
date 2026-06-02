@@ -1,9 +1,9 @@
 use crate::error::MwApiError;
 use hmac::{Hmac, KeyInit, Mac};
-use oauth2::reqwest::async_http_client;
 use oauth2::{
-    AuthUrl, AuthorizationCode, ClientId, ClientSecret, CsrfToken, RedirectUrl, RefreshToken,
-    Scope, TokenResponse as OAuth2TokenResponse, TokenUrl, basic::BasicClient,
+    AuthUrl, AuthorizationCode, ClientId, ClientSecret, CsrfToken, EndpointNotSet, EndpointSet,
+    RedirectUrl, RefreshToken, Scope, TokenResponse as OAuth2TokenResponse, TokenUrl,
+    basic::BasicClient,
 };
 use secrecy::{ExposeSecret, SecretString};
 use serde::{Deserialize, Serialize};
@@ -377,11 +377,12 @@ pub async fn oauth2_exchange_code(
     }
 
     let client = build_oauth2_client(config)?;
+    let http_client = oauth2_http_client()?;
 
     let token_result = client
         .exchange_code(AuthorizationCode::new(code.to_string()))
         .set_pkce_verifier(oauth2::PkceCodeVerifier::new(pkce_verifier.to_string()))
-        .request_async(async_http_client)
+        .request_async(&http_client)
         .await
         .map_err(|e| MwApiError::AuthError {
             reason: format!("OAuth2 token exchange failed: {}", e),
@@ -403,10 +404,11 @@ pub async fn oauth2_refresh_token(
     refresh_token: &str,
 ) -> Result<TokenResponse, MwApiError> {
     let client = build_oauth2_client(config)?;
+    let http_client = oauth2_http_client()?;
 
     let token_result = client
         .exchange_refresh_token(&RefreshToken::new(refresh_token.to_string()))
-        .request_async(async_http_client)
+        .request_async(&http_client)
         .await
         .map_err(|e| MwApiError::AuthError {
             reason: format!("OAuth2 token refresh failed: {}", e),
@@ -422,8 +424,12 @@ pub async fn oauth2_refresh_token(
     })
 }
 
+/// Fully-configured BasicClient typestate: auth and token endpoints set.
+type ConfiguredClient =
+    BasicClient<EndpointSet, EndpointNotSet, EndpointNotSet, EndpointNotSet, EndpointSet>;
+
 /// Build OAuth 2.0 client
-fn build_oauth2_client(config: &OAuth2Config) -> Result<BasicClient, MwApiError> {
+fn build_oauth2_client(config: &OAuth2Config) -> Result<ConfiguredClient, MwApiError> {
     let auth_url =
         AuthUrl::new(config.auth_endpoint.clone()).map_err(|e| MwApiError::AuthError {
             reason: format!("Invalid auth URL: {}", e),
@@ -434,19 +440,29 @@ fn build_oauth2_client(config: &OAuth2Config) -> Result<BasicClient, MwApiError>
             reason: format!("Invalid token URL: {}", e),
         })?;
 
-    Ok(BasicClient::new(
-        ClientId::new(config.client_id.clone()),
-        Some(ClientSecret::new(
-            config.client_secret.expose_secret().to_string(),
-        )),
-        auth_url,
-        Some(token_url),
-    )
-    .set_redirect_uri(RedirectUrl::new(config.redirect_uri.clone()).map_err(|e| {
-        MwApiError::AuthError {
+    let redirect_url =
+        RedirectUrl::new(config.redirect_uri.clone()).map_err(|e| MwApiError::AuthError {
             reason: format!("Invalid redirect URI: {}", e),
-        }
-    })?))
+        })?;
+
+    Ok(BasicClient::new(ClientId::new(config.client_id.clone()))
+        .set_client_secret(ClientSecret::new(
+            config.client_secret.expose_secret().to_string(),
+        ))
+        .set_auth_uri(auth_url)
+        .set_token_uri(token_url)
+        .set_redirect_uri(redirect_url))
+}
+
+/// HTTP client for token endpoint requests. Redirects are disabled to avoid
+/// SSRF via attacker-controlled Location headers on the token endpoint.
+fn oauth2_http_client() -> Result<reqwest::Client, MwApiError> {
+    reqwest::ClientBuilder::new()
+        .redirect(reqwest::redirect::Policy::none())
+        .build()
+        .map_err(|e| MwApiError::AuthError {
+            reason: format!("Failed to build OAuth2 HTTP client: {}", e),
+        })
 }
 
 /// OAuth session manager (handles token lifecycle)
