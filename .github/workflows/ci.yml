@@ -46,6 +46,7 @@ jobs:
         run: cargo fmt --all -- --check
 
       - name: Security Audit
+        if: runner.os == 'Linux'
         run: |
           cargo install cargo-audit
           cargo audit \
