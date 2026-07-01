@@ -315,7 +315,7 @@ dependencies = [
  "awb_storage",
  "awb_telemetry",
  "gio 0.21.5",
- "glib 0.20.12",
+ "glib 0.21.5",
  "gtk4",
  "libadwaita",
  "serde",
@@ -1627,7 +1627,7 @@ dependencies = [
  "gobject-sys 0.20.10",
  "libc",
  "system-deps",
- "windows-sys 0.59.0",
+ "windows-sys 0.52.0",
 ]
 
 [[package]]
