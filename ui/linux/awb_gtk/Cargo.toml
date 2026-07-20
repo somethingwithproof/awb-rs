@@ -24,8 +24,8 @@ tracing-subscriber = { workspace = true }
 # GTK4 dependencies (Linux only)
 gtk = { package = "gtk4", version = "0.9", features = ["v4_10"] }
 libadwaita = { version = "0.7", features = ["v1_5"] }
-glib = "0.21"
-gio = "0.21"
+glib = "0.22"
+gio = "0.22"
 sourceview = { package = "sourceview5", version = "0.9" }
 
 [[bin]]
