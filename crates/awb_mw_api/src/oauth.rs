@@ -459,6 +459,7 @@ fn build_oauth2_client(config: &OAuth2Config) -> Result<ConfiguredClient, MwApiE
 fn oauth2_http_client() -> Result<reqwest::Client, MwApiError> {
     reqwest::ClientBuilder::new()
         .redirect(reqwest::redirect::Policy::none())
+        .timeout(std::time::Duration::from_secs(30))
         .build()
         .map_err(|e| MwApiError::AuthError {
             reason: format!("Failed to build OAuth2 HTTP client: {}", e),
