@@ -149,7 +149,7 @@ impl ReviewStateMachine {
                     index: *index,
                 };
             }
-            (ReviewState::Error { index: _, .. }, ReviewEvent::Resume) => {
+            (ReviewState::Error { .. }, ReviewEvent::Resume) => {
                 self.advance(&mut effects);
             }
             (ReviewState::Paused { .. }, ReviewEvent::Resume) => {
