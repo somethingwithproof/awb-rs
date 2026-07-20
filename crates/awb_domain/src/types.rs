@@ -39,7 +39,7 @@ impl Title {
         let display = if namespace == Namespace::MAIN {
             name.clone()
         } else {
-            format!("{}:{}", namespace.0, &name) // simplified
+            format!("{}:{}", namespace.0, name) // simplified
         };
         Self {
             namespace,
