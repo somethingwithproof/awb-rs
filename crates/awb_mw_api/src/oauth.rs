@@ -9,6 +9,7 @@ use secrecy::{ExposeSecret, SecretString};
 use serde::{Deserialize, Serialize};
 use sha1::Sha1;
 use std::collections::BTreeMap;
+use std::sync::OnceLock;
 use std::time::{SystemTime, UNIX_EPOCH};
 
 type HmacSha1 = Hmac<Sha1>;
@@ -457,13 +458,18 @@ fn build_oauth2_client(config: &OAuth2Config) -> Result<ConfiguredClient, MwApiE
 /// HTTP client for token endpoint requests. Redirects are disabled to avoid
 /// SSRF via attacker-controlled Location headers on the token endpoint.
 fn oauth2_http_client() -> Result<reqwest::Client, MwApiError> {
-    reqwest::ClientBuilder::new()
-        .redirect(reqwest::redirect::Policy::none())
-        .timeout(std::time::Duration::from_secs(30))
-        .build()
-        .map_err(|e| MwApiError::AuthError {
-            reason: format!("Failed to build OAuth2 HTTP client: {}", e),
+    static OAUTH2_HTTP_CLIENT: OnceLock<Result<reqwest::Client, String>> = OnceLock::new();
+
+    OAUTH2_HTTP_CLIENT
+        .get_or_init(|| {
+            reqwest::ClientBuilder::new()
+                .redirect(reqwest::redirect::Policy::none())
+                .timeout(std::time::Duration::from_secs(30))
+                .build()
+                .map_err(|e| format!("Failed to build OAuth2 HTTP client: {}", e))
         })
+        .clone()
+        .map_err(|reason| MwApiError::AuthError { reason })
 }
 
 /// OAuth session manager (handles token lifecycle)
