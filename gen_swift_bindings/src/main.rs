@@ -25,6 +25,7 @@ fn main() -> anyhow::Result<()> {
         modulemap_filename: None,
         metadata_no_deps: false,
         link_frameworks: vec![],
+        config: None,
     };
 
     uniffi_bindgen::bindings::generate_swift_bindings(options)?;
