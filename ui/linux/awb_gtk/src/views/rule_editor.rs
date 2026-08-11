@@ -72,10 +72,10 @@ impl RuleEditor {
 
         let list_box_weak2 = list_box.downgrade();
         remove_button.connect_clicked(move |_| {
-            if let Some(list_box) = list_box_weak2.upgrade() {
-                if let Some(row) = list_box.selected_row() {
-                    list_box.remove(&row);
-                }
+            if let Some(list_box) = list_box_weak2.upgrade()
+                && let Some(row) = list_box.selected_row()
+            {
+                list_box.remove(&row);
             }
         });
 

@@ -85,11 +85,11 @@ impl PageList {
         } else {
             let query = query.to_string();
             list_box.set_filter_func(move |row: &gtk::ListBoxRow| {
-                if let Some(child) = row.child() {
-                    if let Ok(label) = child.downcast::<gtk::Label>() {
-                        let text = label.text().to_lowercase();
-                        return text.contains(&query);
-                    }
+                if let Some(child) = row.child()
+                    && let Ok(label) = child.downcast::<gtk::Label>()
+                {
+                    let text = label.text().to_lowercase();
+                    return text.contains(&query);
                 }
                 false
             });
