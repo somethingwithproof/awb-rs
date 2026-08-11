@@ -52,7 +52,7 @@ fn test_full_transform_pipeline() {
     assert!(!plan.new_wikitext.contains("teh"));
     assert!(!plan.new_wikitext.contains("   ")); // Multiple spaces should be normalized
     assert_eq!(plan.rules_applied.len(), 2); // Both rules should have applied
-    assert!(plan.fixes_applied.len() > 0); // Trailing whitespace fix should apply
+    assert!(!plan.fixes_applied.is_empty()); // Trailing whitespace fix should apply
     assert!(!plan.diff_ops.is_empty()); // Should have diff operations
 }
 

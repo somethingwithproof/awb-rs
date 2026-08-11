@@ -252,7 +252,7 @@ mod tests {
         for _ in 0..100 {
             let jitter = rand_jitter();
             assert!(
-                jitter >= 0.0 && jitter < 1.0,
+                (0.0..1.0).contains(&jitter),
                 "Jitter should be in [0, 1) range"
             );
         }

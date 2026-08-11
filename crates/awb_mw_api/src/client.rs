@@ -855,15 +855,15 @@ mod tests {
         let _bot = AuthState::BotPassword;
 
         // Just verify the enum variants exist and can be instantiated
-        match _none {
-            AuthState::None => assert!(true),
-            _ => assert!(false, "Should be AuthState::None"),
-        }
+        assert!(
+            matches!(_none, AuthState::None),
+            "Should be AuthState::None"
+        );
 
-        match _bot {
-            AuthState::BotPassword => assert!(true),
-            _ => assert!(false, "Should be AuthState::BotPassword"),
-        }
+        assert!(
+            matches!(_bot, AuthState::BotPassword),
+            "Should be AuthState::BotPassword"
+        );
     }
 
     #[test]

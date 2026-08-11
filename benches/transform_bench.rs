@@ -3,8 +3,9 @@ use awb_domain::types::*;
 use awb_engine::diff_engine::compute_diff;
 use awb_engine::general_fixes::{FixContext, FixRegistry};
 use awb_engine::transform::TransformEngine;
-use criterion::{BenchmarkId, Criterion, black_box, criterion_group, criterion_main};
+use criterion::{BenchmarkId, Criterion, criterion_group, criterion_main};
 use std::collections::HashSet;
+use std::hint::black_box;
 
 fn create_test_page(wikitext: &str) -> PageContent {
     PageContent {
