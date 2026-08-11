@@ -327,7 +327,7 @@ mod tests {
     #[test]
     fn test_duration_roundtrip() {
         let original = Duration::from_secs_f64(12.5);
-        let _serialized = serde_json::to_value(&original).unwrap();
+        let _serialized = serde_json::to_value(original).unwrap();
 
         // Manual serialization test
         #[derive(serde::Serialize, serde::Deserialize)]

@@ -3,7 +3,7 @@ use std::process::Command;
 #[test]
 fn test_cli_help() {
     let output = Command::new("cargo")
-        .args(&["run", "--", "--help"])
+        .args(["run", "--", "--help"])
         .current_dir(".")
         .output()
         .expect("Failed to run CLI with --help");
@@ -24,7 +24,7 @@ fn test_cli_help() {
 #[test]
 fn test_cli_version() {
     let output = Command::new("cargo")
-        .args(&["run", "--", "--version"])
+        .args(["run", "--", "--version"])
         .current_dir(".")
         .output()
         .expect("Failed to run CLI with --version");

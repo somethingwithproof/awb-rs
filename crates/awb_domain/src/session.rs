@@ -147,7 +147,7 @@ mod tests {
 
     #[test]
     fn test_edit_decision_variants() {
-        let decisions = vec![
+        let decisions = [
             EditDecision::Save,
             EditDecision::Skip,
             EditDecision::Pause,

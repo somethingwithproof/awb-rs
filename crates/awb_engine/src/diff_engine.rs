@@ -139,11 +139,11 @@ pub fn to_unified(ops: &[DiffOp], context_lines: usize) -> String {
         let hunk_start = cs.saturating_sub(context_lines);
         let hunk_end = (ce + context_lines).min(tagged.len() - 1);
 
-        if let Some(last) = hunks.last_mut() {
-            if hunk_start <= last.end + 1 {
-                last.end = hunk_end;
-                continue;
-            }
+        if let Some(last) = hunks.last_mut()
+            && hunk_start <= last.end + 1
+        {
+            last.end = hunk_end;
+            continue;
         }
         hunks.push(Hunk {
             start: hunk_start,

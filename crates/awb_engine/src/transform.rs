@@ -372,7 +372,7 @@ mod tests {
         let plan = engine.apply(&page);
 
         assert!(!plan.new_wikitext.contains("   "));
-        assert!(plan.fixes_applied.len() > 0);
+        assert!(!plan.fixes_applied.is_empty());
     }
 
     #[test]

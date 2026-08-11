@@ -354,7 +354,7 @@ mod tests {
         let plan = create_test_plan(page);
         machine.transition(ReviewEvent::RulesApplied(plan));
 
-        let effects = machine.transition(ReviewEvent::UserDecision(EditDecision::Skip));
+        let _effects = machine.transition(ReviewEvent::UserDecision(EditDecision::Skip));
 
         assert_eq!(machine.stats.skipped, 1);
         // Should advance to next page
@@ -412,7 +412,7 @@ mod tests {
             timestamp: chrono::Utc::now(),
         };
 
-        let effects = machine.transition(ReviewEvent::SaveComplete(result));
+        let _effects = machine.transition(ReviewEvent::SaveComplete(result));
 
         assert_eq!(machine.stats.saved, 1);
         // Should complete since only one page
@@ -434,7 +434,7 @@ mod tests {
         machine.transition(ReviewEvent::RulesApplied(plan));
         machine.transition(ReviewEvent::UserDecision(EditDecision::Save));
 
-        let effects = machine.transition(ReviewEvent::SaveFailed("Network error".to_string()));
+        let _effects = machine.transition(ReviewEvent::SaveFailed("Network error".to_string()));
 
         assert_eq!(machine.stats.errors, 1);
         assert!(matches!(machine.state, ReviewState::Error { .. }));
@@ -455,7 +455,7 @@ mod tests {
         machine.transition(ReviewEvent::RulesApplied(plan));
         machine.transition(ReviewEvent::UserDecision(EditDecision::Pause));
 
-        let effects = machine.transition(ReviewEvent::Resume);
+        let _effects = machine.transition(ReviewEvent::Resume);
 
         // Should advance to next page
         assert!(matches!(

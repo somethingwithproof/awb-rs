@@ -451,58 +451,74 @@ mod tests {
 
     #[test]
     fn test_validate_rejects_invalid_log_level() {
-        let mut prefs = Preferences::default();
-        prefs.log_level = "verbose".to_string();
+        let prefs = Preferences {
+            log_level: "verbose".to_string(),
+            ..Default::default()
+        };
         assert!(prefs.validate().is_err());
     }
 
     #[test]
     fn test_validate_rejects_invalid_diff_mode() {
-        let mut prefs = Preferences::default();
-        prefs.diff_mode = "fancy".to_string();
+        let prefs = Preferences {
+            diff_mode: "fancy".to_string(),
+            ..Default::default()
+        };
         assert!(prefs.validate().is_err());
     }
 
     #[test]
     fn test_validate_rejects_zero_context_lines() {
-        let mut prefs = Preferences::default();
-        prefs.diff_context_lines = 0;
+        let prefs = Preferences {
+            diff_context_lines: 0,
+            ..Default::default()
+        };
         assert!(prefs.validate().is_err());
     }
 
     #[test]
     fn test_validate_rejects_excessive_context_lines() {
-        let mut prefs = Preferences::default();
-        prefs.diff_context_lines = 51;
+        let prefs = Preferences {
+            diff_context_lines: 51,
+            ..Default::default()
+        };
         assert!(prefs.validate().is_err());
     }
 
     #[test]
     fn test_validate_rejects_low_auto_save_interval() {
-        let mut prefs = Preferences::default();
-        prefs.auto_save_interval_secs = 2;
+        let prefs = Preferences {
+            auto_save_interval_secs: 2,
+            ..Default::default()
+        };
         assert!(prefs.validate().is_err());
     }
 
     #[test]
     fn test_validate_rejects_low_change_threshold() {
-        let mut prefs = Preferences::default();
-        prefs.confirm_large_change_threshold = 5;
+        let prefs = Preferences {
+            confirm_large_change_threshold: 5,
+            ..Default::default()
+        };
         assert!(prefs.validate().is_err());
     }
 
     #[test]
     fn test_validate_rejects_invalid_theme() {
-        let mut prefs = Preferences::default();
-        prefs.theme = "rainbow".to_string();
+        let prefs = Preferences {
+            theme: "rainbow".to_string(),
+            ..Default::default()
+        };
         assert!(prefs.validate().is_err());
     }
 
     #[test]
     fn test_validate_accepts_valid_themes() {
-        let mut prefs = Preferences::default();
+        let mut prefs = Preferences {
+            theme: "system".to_string(),
 
-        prefs.theme = "system".to_string();
+            ..Default::default()
+        };
         assert!(prefs.validate().is_ok());
 
         prefs.theme = "dark".to_string();

@@ -164,7 +164,7 @@ mod tests {
             line_no: 42,
             text: "test line".to_string(),
             change_type: ChangeType::Modified,
-            inline_changes: vec![5..10],
+            inline_changes: vec![Range { start: 5, end: 10 }],
         };
 
         assert_eq!(line.line_no, 42);
