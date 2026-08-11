@@ -50,22 +50,22 @@ impl SkipEngine {
                     min_bytes,
                     max_bytes,
                 } => {
-                    if let Some(min) = min_bytes {
-                        if page.size_bytes < *min {
-                            return SkipDecision::Skip("page too small");
-                        }
+                    if let Some(min) = min_bytes
+                        && page.size_bytes < *min
+                    {
+                        return SkipDecision::Skip("page too small");
                     }
-                    if let Some(max) = max_bytes {
-                        if page.size_bytes > *max {
-                            return SkipDecision::Skip("page too large");
-                        }
+                    if let Some(max) = max_bytes
+                        && page.size_bytes > *max
+                    {
+                        return SkipDecision::Skip("page too large");
                     }
                 }
                 SkipCondition::Protection { max_level } => {
-                    if let Some(level) = &page.protection.edit {
-                        if protection_exceeds(level, max_level) {
-                            return SkipDecision::Skip("protection too high");
-                        }
+                    if let Some(level) = &page.protection.edit
+                        && protection_exceeds(level, max_level)
+                    {
+                        return SkipDecision::Skip("protection too high");
                     }
                 }
                 SkipCondition::IsRedirect(skip_redirects) => {

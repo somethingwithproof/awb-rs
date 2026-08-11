@@ -101,10 +101,10 @@ impl SessionStore for JsonSessionStore {
         // fsync parent directory to ensure the rename is durable (Unix only)
         #[cfg(unix)]
         {
-            if let Some(parent) = final_path.parent() {
-                if let Ok(dir) = tokio::fs::File::open(parent).await {
-                    let _ = dir.sync_all().await;
-                }
+            if let Some(parent) = final_path.parent()
+                && let Ok(dir) = tokio::fs::File::open(parent).await
+            {
+                let _ = dir.sync_all().await;
             }
         }
         Ok(())
@@ -141,10 +141,10 @@ impl SessionStore for JsonSessionStore {
         let mut entries = tokio::fs::read_dir(&self.dir).await?;
         while let Some(entry) = entries.next_entry().await? {
             let path = entry.path();
-            if path.extension().is_some_and(|e| e == "json") {
-                if let Some(stem) = path.file_stem().and_then(|s| s.to_str()) {
-                    sessions.push(stem.to_string());
-                }
+            if path.extension().is_some_and(|e| e == "json")
+                && let Some(stem) = path.file_stem().and_then(|s| s.to_str())
+            {
+                sessions.push(stem.to_string());
             }
         }
         Ok(sessions)

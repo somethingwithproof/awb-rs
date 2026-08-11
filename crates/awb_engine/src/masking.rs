@@ -139,54 +139,59 @@ pub fn mask(text: &str) -> MaskedText {
 
     while i < len {
         // 1. HTML comments: <!-- ... -->
-        if i + 4 <= len && &bytes[i..i + 4] == b"<!--" {
-            if let Some(end) = find_bytes(bytes, i + 4, b"-->") {
-                let end = end + 3; // include -->
-                let region = &text[i..end];
-                let idx = regions.len();
-                regions.push(region.to_string());
-                result.push_str(&format!("{}{}{}", sentinel_base, idx, SENTINEL_SUFFIX));
-                i = end;
-                continue;
-            }
+        if i + 4 <= len
+            && &bytes[i..i + 4] == b"<!--"
+            && let Some(end) = find_bytes(bytes, i + 4, b"-->")
+        {
+            let end = end + 3; // include -->
+            let region = &text[i..end];
+            let idx = regions.len();
+            regions.push(region.to_string());
+            result.push_str(&format!("{}{}{}", sentinel_base, idx, SENTINEL_SUFFIX));
+            i = end;
+            continue;
         }
 
         // 2. Extension tags (case-insensitive)
-        if bytes[i] == b'<' {
-            if let Some((tag_name, close_pos)) = try_match_extension_tag(text, i) {
-                let region = &text[i..close_pos];
-                let idx = regions.len();
-                regions.push(region.to_string());
-                result.push_str(&format!("{}{}{}", sentinel_base, idx, SENTINEL_SUFFIX));
-                i = close_pos;
-                let _ = tag_name; // used in try_match_extension_tag
-                continue;
-            }
+        if bytes[i] == b'<'
+            && let Some((tag_name, close_pos)) = try_match_extension_tag(text, i)
+        {
+            let region = &text[i..close_pos];
+            let idx = regions.len();
+            regions.push(region.to_string());
+            result.push_str(&format!("{}{}{}", sentinel_base, idx, SENTINEL_SUFFIX));
+            i = close_pos;
+            let _ = tag_name; // used in try_match_extension_tag
+            continue;
         }
 
         // 3. Templates: {{ ... }} with brace-depth tracking
-        if i + 1 < len && bytes[i] == b'{' && bytes[i + 1] == b'{' {
-            if let Some(end) = find_matching_braces(bytes, i) {
-                let region = &text[i..end];
-                let idx = regions.len();
-                regions.push(region.to_string());
-                result.push_str(&format!("{}{}{}", sentinel_base, idx, SENTINEL_SUFFIX));
-                i = end;
-                continue;
-            }
+        if i + 1 < len
+            && bytes[i] == b'{'
+            && bytes[i + 1] == b'{'
+            && let Some(end) = find_matching_braces(bytes, i)
+        {
+            let region = &text[i..end];
+            let idx = regions.len();
+            regions.push(region.to_string());
+            result.push_str(&format!("{}{}{}", sentinel_base, idx, SENTINEL_SUFFIX));
+            i = end;
+            continue;
         }
 
         // 4. File/Image links: [[File:...]] or [[Image:...]]
-        if i + 2 < len && bytes[i] == b'[' && bytes[i + 1] == b'[' && is_file_or_image_link(text, i)
+        if i + 2 < len
+            && bytes[i] == b'['
+            && bytes[i + 1] == b'['
+            && is_file_or_image_link(text, i)
+            && let Some(end) = find_matching_brackets(bytes, i)
         {
-            if let Some(end) = find_matching_brackets(bytes, i) {
-                let region = &text[i..end];
-                let idx = regions.len();
-                regions.push(region.to_string());
-                result.push_str(&format!("{}{}{}", sentinel_base, idx, SENTINEL_SUFFIX));
-                i = end;
-                continue;
-            }
+            let region = &text[i..end];
+            let idx = regions.len();
+            regions.push(region.to_string());
+            result.push_str(&format!("{}{}{}", sentinel_base, idx, SENTINEL_SUFFIX));
+            i = end;
+            continue;
         }
 
         // No match — copy character
@@ -333,11 +338,12 @@ fn find_matching_braces(bytes: &[u8], start: usize) -> Option<usize> {
     let len = bytes.len();
     while i < len {
         // Skip HTML comments: <!-- ... -->
-        if i + 3 < len && &bytes[i..i + 4] == b"<!--" {
-            if let Some(end) = find_bytes(bytes, i + 4, b"-->") {
-                i = end + 3;
-                continue;
-            }
+        if i + 3 < len
+            && &bytes[i..i + 4] == b"<!--"
+            && let Some(end) = find_bytes(bytes, i + 4, b"-->")
+        {
+            i = end + 3;
+            continue;
         }
         if i + 1 < len && bytes[i] == b'{' && bytes[i + 1] == b'{' {
             depth += 1;

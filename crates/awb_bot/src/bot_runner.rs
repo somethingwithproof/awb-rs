@@ -522,10 +522,10 @@ impl<C: MediaWikiClient> BotRunner<C> {
         }
 
         // Check max edits
-        if let Some(max) = self.config.max_edits {
-            if self.report.pages_edited >= max as usize {
-                return Ok(Some(format!("Maximum edits reached: {}", max)));
-            }
+        if let Some(max) = self.config.max_edits
+            && self.report.pages_edited >= max as usize
+        {
+            return Ok(Some(format!("Maximum edits reached: {}", max)));
         }
 
         // Check max runtime
