@@ -19,7 +19,7 @@ version = "0.1.0"
 edition = "2024"
 license = "MIT OR Apache-2.0"
 repository = "https://github.com/thomasvincent/awb-rs"
-rust-version = "1.85"
+rust-version = "1.94"
 authors = ["Thomas Vincent"]
 homepage = "https://github.com/thomasvincent/awb-rs"
 documentation = "https://docs.rs/awb_domain"
@@ -71,7 +71,7 @@ indexmap = "2"
 
 # Plugins
 mlua = { version = "0.11", features = ["lua54", "vendored", "async", "send"] }
-wasmtime = "43"
+wasmtime = "47"
 
 # FFI
 uniffi = { version = "0.32", features = ["cli"] }
