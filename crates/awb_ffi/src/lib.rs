@@ -1,5 +1,6 @@
 // Allow clippy warning in UniFFI-generated code
 #![allow(clippy::empty_line_after_doc_comments)]
+#![allow(clippy::large_const_arrays)]
 
 pub mod c_api;
 
