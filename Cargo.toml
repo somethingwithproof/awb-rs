@@ -114,7 +114,7 @@ tracing = { workspace = true }
 [dev-dependencies]
 criterion = { workspace = true }
 tempfile = "3"
-uniffi_bindgen = { version = "0.31.0", features = ["cargo-metadata"] }
+uniffi_bindgen = { version = "0.32.0", features = ["cargo-metadata"] }
 
 [[bench]]
 name = "transform_bench"
