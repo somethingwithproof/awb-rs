@@ -68,10 +68,13 @@ pub async fn setup(
 
     // Save profile
     let profile_path = format!(".awb/profiles/{}.toml", profile);
-    std::fs::create_dir_all(".awb/profiles").context("Failed to create profiles directory")?;
+    tokio::fs::create_dir_all(".awb/profiles")
+        .await
+        .context("Failed to create profiles directory")?;
     let profile_toml =
         toml::to_string_pretty(&profile_obj).context("Failed to serialize profile")?;
-    std::fs::write(&profile_path, profile_toml)
+    tokio::fs::write(&profile_path, profile_toml)
+        .await
         .context(format!("Failed to write profile to {}", profile_path))?;
 
     println!("✓ OAuth 1.0a credentials saved to profile '{}'", profile);
@@ -174,10 +177,13 @@ pub async fn authorize(wiki: Url, client_id: String, profile: String) -> Result<
     };
 
     let profile_path = format!(".awb/profiles/{}.toml", profile);
-    std::fs::create_dir_all(".awb/profiles").context("Failed to create profiles directory")?;
+    tokio::fs::create_dir_all(".awb/profiles")
+        .await
+        .context("Failed to create profiles directory")?;
     let profile_toml =
         toml::to_string_pretty(&profile_obj).context("Failed to serialize profile")?;
-    std::fs::write(&profile_path, profile_toml)
+    tokio::fs::write(&profile_path, profile_toml)
+        .await
         .context(format!("Failed to write profile to {}", profile_path))?;
 
     println!(

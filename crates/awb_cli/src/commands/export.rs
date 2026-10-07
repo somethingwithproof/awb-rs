@@ -1,7 +1,6 @@
 use anyhow::{Context, Result};
 use awb_telemetry::{ExportFormat as TelemetryFormat, export_log};
 use console::style;
-use std::fs::File;
 use std::path::PathBuf;
 
 use crate::ExportFormat;
@@ -22,7 +21,11 @@ pub async fn run(format: ExportFormat, output: PathBuf) -> Result<()> {
         ExportFormat::Plain => TelemetryFormat::PlainText,
     };
 
-    let mut file = File::create(&output).context("Failed to create output file")?;
+    let mut file = tokio::fs::File::create(&output)
+        .await
+        .context("Failed to create output file")?
+        .into_std()
+        .await;
 
     export_log(&events, telemetry_format, &mut file).context("Failed to export log")?;
 
