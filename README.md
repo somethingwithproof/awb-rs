@@ -1,8 +1,10 @@
 # awb-rs
 
 [![CI](https://github.com/thomasvincent/awb-rs/workflows/CI/badge.svg)](https://github.com/thomasvincent/awb-rs/actions)
+[![Release](https://img.shields.io/github/v/release/somethingwithproof/awb-rs)](https://github.com/somethingwithproof/awb-rs/releases)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 [![License: Apache 2.0](https://img.shields.io/badge/License-Apache%202.0-blue.svg)](https://opensource.org/licenses/Apache-2.0)
+[![OpenSSF Scorecard](https://api.scorecard.dev/projects/github.com/somethingwithproof/awb-rs/badge)](https://scorecard.dev/viewer/?uri=github.com/somethingwithproof/awb-rs)
 
 A modern, high-performance AutoWikiBrowser (AWB) rewrite in Rust, providing automated Wikipedia editing capabilities with a focus on safety, performance, and extensibility.
 
