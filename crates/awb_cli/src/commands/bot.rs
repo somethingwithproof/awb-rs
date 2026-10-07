@@ -175,7 +175,9 @@ pub async fn run(args: BotRunArgs) -> Result<()> {
         "bot-report-{}.json",
         chrono::Utc::now().format("%Y%m%d-%H%M%S")
     ));
-    std::fs::write(&report_path, report.to_json()?).context("Failed to save report")?;
+    tokio::fs::write(&report_path, report.to_json()?)
+        .await
+        .context("Failed to save report")?;
     println!("Report saved to: {}", report_path.display());
 
     Ok(())
