@@ -1,8 +1,10 @@
 # awb-rs
 
-[![CI](https://github.com/thomasvincent/awb-rs/workflows/CI/badge.svg)](https://github.com/thomasvincent/awb-rs/actions)
+[![CI](https://github.com/somethingwithproof/awb-rs/workflows/CI/badge.svg)](https://github.com/somethingwithproof/awb-rs/actions)
+[![Release](https://img.shields.io/github/v/release/somethingwithproof/awb-rs)](https://github.com/somethingwithproof/awb-rs/releases)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 [![License: Apache 2.0](https://img.shields.io/badge/License-Apache%202.0-blue.svg)](https://opensource.org/licenses/Apache-2.0)
+[![OpenSSF Scorecard](https://api.scorecard.dev/projects/github.com/somethingwithproof/awb-rs/badge)](https://scorecard.dev/viewer/?uri=github.com/somethingwithproof/awb-rs)
 
 A modern, high-performance AutoWikiBrowser (AWB) rewrite in Rust, providing automated Wikipedia editing capabilities with a focus on safety, performance, and extensibility.
 
@@ -58,7 +60,7 @@ CLI → Core → API → MediaWiki
 
 ```bash
 # Clone the repository
-git clone https://github.com/thomasvincent/awb-rs.git
+git clone https://github.com/somethingwithproof/awb-rs.git
 cd awb-rs
 
 # Build all workspace crates
@@ -281,5 +283,5 @@ This is an active rewrite of AutoWikiBrowser in Rust. Current status:
 ## Links
 
 - [Documentation](https://docs.rs/awb-rs)
-- [Issue Tracker](https://github.com/thomasvincent/awb-rs/issues)
+- [Issue Tracker](https://github.com/somethingwithproof/awb-rs/issues)
 - [Original AWB](https://en.wikipedia.org/wiki/Wikipedia:AutoWikiBrowser)
