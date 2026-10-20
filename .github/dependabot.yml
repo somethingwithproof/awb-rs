@@ -4,11 +4,41 @@ updates:
     directory: /
     schedule:
       interval: weekly
+      day: monday
+    commit-message:
+      prefix: ci(deps)
     groups:
       github-actions:
         patterns:
           - "*"
+        update-types:
+          - "minor"
+          - "patch"
   - package-ecosystem: cargo
     directory: /
     schedule:
       interval: weekly
+      day: monday
+    commit-message:
+      prefix: build(deps)
+    groups:
+      cargo-minor-patch:
+        patterns:
+          - "*"
+        update-types:
+          - minor
+          - patch
+  - package-ecosystem: nuget
+    directory: /ui/windows/AWBrowser
+    schedule:
+      interval: weekly
+      day: monday
+    commit-message:
+      prefix: build(deps)
+    groups:
+      nuget-minor-patch:
+        patterns:
+          - "*"
+        update-types:
+          - minor
+          - patch
