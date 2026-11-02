@@ -28,7 +28,7 @@ thiserror = { workspace = true }
 tokio = { workspace = true }
 uniffi = { workspace = true }
 lazy_static = "1.4"
-parking_lot = "0.12"
+parking_lot = "0.13"
 chrono = { workspace = true }
 secrecy = { workspace = true }
 url = { workspace = true }
