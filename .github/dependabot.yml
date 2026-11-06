@@ -5,6 +5,8 @@ updates:
     schedule:
       interval: weekly
       day: monday
+    cooldown:
+      default-days: 7
     commit-message:
       prefix: ci(deps)
     groups:
@@ -21,6 +23,8 @@ updates:
       day: monday
     commit-message:
       prefix: build(deps)
+    cooldown:
+      default-days: 7
     groups:
       cargo-minor-patch:
         patterns:
@@ -35,6 +39,8 @@ updates:
       day: monday
     commit-message:
       prefix: build(deps)
+    cooldown:
+      default-days: 7
     groups:
       nuget-minor-patch:
         patterns:
