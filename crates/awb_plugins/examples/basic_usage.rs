@@ -1,3 +1,6 @@
+// SPDX-FileCopyrightText: 2026 Thomas Vincent <thomasvincent@gmail.com>
+// SPDX-License-Identifier: MIT
+
 //! Basic usage example for AWB plugins
 //!
 //! Run with: cargo run --example basic_usage

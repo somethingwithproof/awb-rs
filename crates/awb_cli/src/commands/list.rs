@@ -1,3 +1,6 @@
+// SPDX-FileCopyrightText: 2026 Thomas Vincent <thomasvincent@gmail.com>
+// SPDX-License-Identifier: MIT
+
 use anyhow::{Context, Result};
 use awb_domain::types::Title;
 use awb_mw_api::list_endpoints::{fetch_all_pages, fetch_user_contributions, fetch_watchlist};

@@ -1,3 +1,6 @@
+// SPDX-FileCopyrightText: 2026 Thomas Vincent <thomasvincent@gmail.com>
+// SPDX-License-Identifier: MIT
+
 //! Generate UniFFI Swift bindings for AWB-RS
 //!
 //! Run with: cargo run -p gen_swift_bindings

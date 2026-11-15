@@ -1,3 +1,6 @@
+// SPDX-FileCopyrightText: 2026 Thomas Vincent <thomasvincent@gmail.com>
+// SPDX-License-Identifier: MIT
+
 // GTK4 Linux UI for AWB-RS
 //
 // This crate provides a native Linux interface using GTK4 and libadwaita.

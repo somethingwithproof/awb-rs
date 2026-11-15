@@ -1,3 +1,6 @@
+// SPDX-FileCopyrightText: 2026 Thomas Vincent <thomasvincent@gmail.com>
+// SPDX-License-Identifier: MIT
+
 use crate::error::MwApiError;
 use crate::oauth::{OAuth1Config, OAuthSession};
 use crate::retry::RetryPolicy;

@@ -1,3 +1,6 @@
+// SPDX-FileCopyrightText: 2026 Thomas Vincent <thomasvincent@gmail.com>
+// SPDX-License-Identifier: MIT
+
 use crate::types::Namespace;
 use secrecy::SecretString;
 use serde::{Deserialize, Serialize};

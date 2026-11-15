@@ -1,3 +1,6 @@
+// SPDX-FileCopyrightText: 2026 Thomas Vincent <thomasvincent@gmail.com>
+// SPDX-License-Identifier: MIT
+
 use crate::error::Result;
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]

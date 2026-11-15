@@ -1,3 +1,6 @@
+// SPDX-FileCopyrightText: 2026 Thomas Vincent <thomasvincent@gmail.com>
+// SPDX-License-Identifier: MIT
+
 //! Masking engine: protects regions of wikitext that must not be transformed.
 //!
 //! The mask→transform→unmask pattern ensures that content inside `<nowiki>`,

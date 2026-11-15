@@ -1,3 +1,6 @@
+// SPDX-FileCopyrightText: 2026 Thomas Vincent <thomasvincent@gmail.com>
+// SPDX-License-Identifier: MIT
+
 use awb_domain::session::*;
 use awb_domain::types::*;
 use awb_domain::warnings::Warning;

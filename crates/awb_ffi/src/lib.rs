@@ -1,3 +1,6 @@
+// SPDX-FileCopyrightText: 2026 Thomas Vincent <thomasvincent@gmail.com>
+// SPDX-License-Identifier: MIT
+
 // Allow clippy warning in UniFFI-generated code
 #![allow(clippy::empty_line_after_doc_comments)]
 #![allow(clippy::large_const_arrays)]

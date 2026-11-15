@@ -1,3 +1,6 @@
+// SPDX-FileCopyrightText: 2026 Thomas Vincent <thomasvincent@gmail.com>
+// SPDX-License-Identifier: MIT
+
 use anyhow::{Context, Result};
 use awb_security::{CredentialPort, KeyringCredentialStore};
 use dialoguer::{Input, Password};

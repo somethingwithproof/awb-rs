@@ -1,3 +1,6 @@
+// SPDX-FileCopyrightText: 2026 Thomas Vincent <thomasvincent@gmail.com>
+// SPDX-License-Identifier: MIT
+
 use anyhow::{Context, Result};
 use awb_telemetry::{ExportFormat as TelemetryFormat, export_log};
 use console::style;

@@ -1,3 +1,6 @@
+// SPDX-FileCopyrightText: 2026 Thomas Vincent <thomasvincent@gmail.com>
+// SPDX-License-Identifier: MIT
+
 use awb_bot::checkpoint::Checkpoint;
 use awb_bot::config::BotConfig;
 use awb_bot::report::{BotReport, PageAction, PageResult};

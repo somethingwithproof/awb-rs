@@ -1,3 +1,6 @@
+// SPDX-FileCopyrightText: 2026 Thomas Vincent <thomasvincent@gmail.com>
+// SPDX-License-Identifier: MIT
+
 //! # AWB Plugins
 //!
 //! Plugin system for AutoWikiBrowser Rust (AWB-RS) allowing user-defined text transformations

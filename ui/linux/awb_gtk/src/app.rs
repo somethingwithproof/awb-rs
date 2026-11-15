@@ -1,3 +1,6 @@
+// SPDX-FileCopyrightText: 2026 Thomas Vincent <thomasvincent@gmail.com>
+// SPDX-License-Identifier: MIT
+
 use gtk::prelude::*;
 use gtk::{gio, glib};
 use libadwaita as adw;

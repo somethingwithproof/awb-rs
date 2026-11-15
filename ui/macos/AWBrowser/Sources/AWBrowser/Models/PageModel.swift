@@ -1,3 +1,6 @@
+// SPDX-FileCopyrightText: 2026 Thomas Vincent <thomasvincent@gmail.com>
+// SPDX-License-Identifier: MIT
+
 import Foundation
 
 // Note: SessionHandle, PageInfo, and TransformResult are now defined in Generated/awb_ffi.swift
