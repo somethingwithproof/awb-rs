@@ -1,3 +1,6 @@
+// SPDX-FileCopyrightText: 2026 Thomas Vincent <thomasvincent@gmail.com>
+// SPDX-License-Identifier: MIT
+
 use awb_domain::types::{Namespace, Title};
 use awb_engine::general_fixes::{
     CitationFormatting, DefaultSortFix, DuplicateWikilinkRemoval, FixContext, FixModule,

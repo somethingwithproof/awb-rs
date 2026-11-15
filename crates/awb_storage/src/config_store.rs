@@ -1,3 +1,6 @@
+// SPDX-FileCopyrightText: 2026 Thomas Vincent <thomasvincent@gmail.com>
+// SPDX-License-Identifier: MIT
+
 use crate::error::StorageError;
 use awb_domain::profile::Profile;
 use fs2::FileExt;

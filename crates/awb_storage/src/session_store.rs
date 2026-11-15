@@ -1,3 +1,6 @@
+// SPDX-FileCopyrightText: 2026 Thomas Vincent <thomasvincent@gmail.com>
+// SPDX-License-Identifier: MIT
+
 use crate::error::StorageError;
 use async_trait::async_trait;
 use awb_domain::session::SessionState;

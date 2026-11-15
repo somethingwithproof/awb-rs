@@ -1,3 +1,6 @@
+// SPDX-FileCopyrightText: 2026 Thomas Vincent <thomasvincent@gmail.com>
+// SPDX-License-Identifier: MIT
+
 use crate::diff::DiffOp;
 use crate::rules::RuleSet;
 use crate::types::*;

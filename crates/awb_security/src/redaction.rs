@@ -1,3 +1,6 @@
+// SPDX-FileCopyrightText: 2026 Thomas Vincent <thomasvincent@gmail.com>
+// SPDX-License-Identifier: MIT
+
 /// Minimum secret length to avoid false-positive redaction of short substrings.
 const MIN_SECRET_LEN: usize = 8;
 

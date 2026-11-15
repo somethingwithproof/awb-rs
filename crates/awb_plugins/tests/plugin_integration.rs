@@ -1,3 +1,6 @@
+// SPDX-FileCopyrightText: 2026 Thomas Vincent <thomasvincent@gmail.com>
+// SPDX-License-Identifier: MIT
+
 use awb_plugins::error::PluginError;
 use awb_plugins::lua_plugin::LuaPlugin;
 use awb_plugins::plugin_manager::PluginManager;

@@ -1,3 +1,6 @@
+// SPDX-FileCopyrightText: 2026 Thomas Vincent <thomasvincent@gmail.com>
+// SPDX-License-Identifier: MIT
+
 use crate::error::{PluginError, Result};
 use crate::plugin_trait::{Plugin, PluginType};
 use crate::sandbox::SandboxConfig;

@@ -1,3 +1,6 @@
+// SPDX-FileCopyrightText: 2026 Thomas Vincent <thomasvincent@gmail.com>
+// SPDX-License-Identifier: MIT
+
 use crate::general_fixes::{FixContext, FixModule};
 use regex::Regex;
 use std::borrow::Cow;

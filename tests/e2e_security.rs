@@ -1,3 +1,6 @@
+// SPDX-FileCopyrightText: 2026 Thomas Vincent <thomasvincent@gmail.com>
+// SPDX-License-Identifier: MIT
+
 use awb_security::credential::{CredentialPort, InMemoryCredentialStore};
 use awb_security::redact_secrets;
 

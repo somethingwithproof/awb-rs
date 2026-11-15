@@ -1,3 +1,6 @@
+// SPDX-FileCopyrightText: 2026 Thomas Vincent <thomasvincent@gmail.com>
+// SPDX-License-Identifier: MIT
+
 use crate::fix_config::{ApplyResult, FixClassification, FixConfig, FixConfigError};
 use awb_domain::types::{Namespace, Title};
 use std::borrow::Cow;

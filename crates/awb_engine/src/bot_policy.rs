@@ -1,3 +1,6 @@
+// SPDX-FileCopyrightText: 2026 Thomas Vincent <thomasvincent@gmail.com>
+// SPDX-License-Identifier: MIT
+
 //! {{bots}} / {{nobots}} handling for Wikipedia bot policy compliance.
 //!
 //! Detects exclusion templates in wikitext and determines whether a named bot

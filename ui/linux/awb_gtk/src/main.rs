@@ -1,3 +1,6 @@
+// SPDX-FileCopyrightText: 2026 Thomas Vincent <thomasvincent@gmail.com>
+// SPDX-License-Identifier: MIT
+
 #[cfg(target_os = "linux")]
 mod app;
 #[cfg(target_os = "linux")]

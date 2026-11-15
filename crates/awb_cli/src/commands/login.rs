@@ -1,3 +1,6 @@
+// SPDX-FileCopyrightText: 2026 Thomas Vincent <thomasvincent@gmail.com>
+// SPDX-License-Identifier: MIT
+
 use anyhow::{Context, Result};
 use awb_mw_api::client::{MediaWikiClient, ReqwestMwClient};
 use awb_security::{CredentialPort, KeyringCredentialStore};

@@ -1,3 +1,6 @@
+// SPDX-FileCopyrightText: 2026 Thomas Vincent <thomasvincent@gmail.com>
+// SPDX-License-Identifier: MIT
+
 use awb_domain::profile::ThrottlePolicy;
 use awb_domain::rules::{Rule, RuleSet};
 use awb_domain::session::{EditDecision, SkipCondition, SkipDecision};

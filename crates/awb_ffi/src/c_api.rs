@@ -1,3 +1,6 @@
+// SPDX-FileCopyrightText: 2026 Thomas Vincent <thomasvincent@gmail.com>
+// SPDX-License-Identifier: MIT
+
 // C API implementation for platforms that need direct C ABI access
 // This complements the UniFFI interface for Swift/Kotlin
 //
