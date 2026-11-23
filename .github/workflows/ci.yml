@@ -66,4 +66,6 @@ jobs:
             RUSTSEC-2026-0097,
             RUSTSEC-2026-0098,
             RUSTSEC-2026-0099,
-            RUSTSEC-2025-0134
+            RUSTSEC-2025-0134,
+            RUSTSEC-2026-0543,
+            RUSTSEC-2026-0374
