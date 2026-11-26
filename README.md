@@ -48,11 +48,11 @@ CLI → Core → API → MediaWiki
 - **Dry-Run Mode**: Preview changes before applying them
 - **State Management**: Resume interrupted sessions
 - **Rate Limiting**: Respects wiki API limits and best practices
-- **Internationalization**: 45 display languages via `--lang`, `AWB_LANG`, or POSIX locale (`LC_ALL`/`LC_MESSAGES`/`LANG`), including RTL layout support for Arabic, Persian, Hebrew, and Urdu
+- **Internationalization**: 48 display languages via `--lang`, `AWB_LANG`, or POSIX locale (`LC_ALL`/`LC_MESSAGES`/`LANG`), including RTL layout support for Arabic, Persian, Hebrew, and Urdu
 
 ## Supported Languages
 
-The CLI, bot reports, and GTK4 UI support 45 languages (including 6 RTL locales: `ar`, `ar-EG`, `ar-MA`, `fa`, `he`, and `ur`). Pass `--lang <LANG>` in the CLI, or set `AWB_LANG` / POSIX locale variables (`LC_ALL`/`LC_MESSAGES`/`LANG`) for both the CLI and GTK4 UI.
+The CLI, bot reports, and GTK4 UI support 48 languages (including 6 RTL locales: `ar`, `ar-EG`, `ar-MA`, `fa`, `he`, and `ur`). Pass `--lang <LANG>` in the CLI, or set `AWB_LANG` / POSIX locale variables (`LC_ALL`/`LC_MESSAGES`/`LANG`) for both the CLI and GTK4 UI.
 
 | Code | Language | README | Code | Language | README | Code | Language | README |
 | --- | --- | --- | --- | --- | --- | --- | --- | --- |
@@ -71,6 +71,7 @@ The CLI, bot reports, and GTK4 UI support 45 languages (including 6 RTL locales:
 | `zh-TW` | 繁體中文 | [README](docs/i18n/zh-TW/README.md) | `ig-NG` | Igbo | [README](docs/i18n/ig-NG/README.md) | `ur` | اردو (RTL) | [README](docs/i18n/ur/README.md) |
 | `ar` | العربية (RTL) | [README](docs/i18n/ar/README.md) | `mg-MG` | Malagasy | [README](docs/i18n/mg-MG/README.md) | `ms` | Bahasa Melayu | [README](docs/i18n/ms/README.md) |
 | `hi` | हिन्दी | [README](docs/i18n/hi/README.md) | `rw-RW` | Kinyarwanda | [README](docs/i18n/rw-RW/README.md) | `fil` | Filipino | [README](docs/i18n/fil/README.md) |
+| `bs` | Bosanski | [README](docs/i18n/bs/README.md) | `hr` | Hrvatski | [README](docs/i18n/hr/README.md) | `sr` | Српски | [README](docs/i18n/sr/README.md) |
 
 ## Prerequisites
 
