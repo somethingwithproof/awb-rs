@@ -1,6 +1,7 @@
 // SPDX-FileCopyrightText: 2026 Thomas Vincent <thomasvincent@gmail.com>
 // SPDX-License-Identifier: MIT
 
+use awb_domain::i18n::Locale;
 use gtk::prelude::*;
 
 pub struct RuleEditor {
@@ -11,6 +12,7 @@ pub struct RuleEditor {
 
 impl RuleEditor {
     pub fn new() -> Self {
+        let cat = Locale::resolve(None).catalog();
         let container = gtk::Box::builder()
             .orientation(gtk::Orientation::Vertical)
             .vexpand(true)
@@ -28,25 +30,25 @@ impl RuleEditor {
 
         let add_button = gtk::Button::builder()
             .icon_name("list-add-symbolic")
-            .tooltip_text("Add rule")
+            .tooltip_text(cat.gtk_tooltip_add_rule)
             .build();
         toolbar.append(&add_button);
 
         let remove_button = gtk::Button::builder()
             .icon_name("list-remove-symbolic")
-            .tooltip_text("Remove rule")
+            .tooltip_text(cat.gtk_tooltip_remove_rule)
             .build();
         toolbar.append(&remove_button);
 
         let up_button = gtk::Button::builder()
             .icon_name("go-up-symbolic")
-            .tooltip_text("Move up")
+            .tooltip_text(cat.gtk_tooltip_move_up)
             .build();
         toolbar.append(&up_button);
 
         let down_button = gtk::Button::builder()
             .icon_name("go-down-symbolic")
-            .tooltip_text("Move down")
+            .tooltip_text(cat.gtk_tooltip_move_down)
             .build();
         toolbar.append(&down_button);
 
@@ -93,6 +95,7 @@ impl RuleEditor {
     }
 
     fn add_rule(list_box: &gtk::ListBox) {
+        let cat = Locale::resolve(None).catalog();
         let rule_row = gtk::Box::builder()
             .orientation(gtk::Orientation::Horizontal)
             .spacing(5)
@@ -106,19 +109,19 @@ impl RuleEditor {
         rule_row.append(&enabled_check);
 
         let pattern_entry = gtk::Entry::builder()
-            .placeholder_text("Find pattern...")
+            .placeholder_text(cat.gtk_placeholder_find)
             .hexpand(true)
             .build();
         rule_row.append(&pattern_entry);
 
         let replacement_entry = gtk::Entry::builder()
-            .placeholder_text("Replace with...")
+            .placeholder_text(cat.gtk_placeholder_replace)
             .hexpand(true)
             .build();
         rule_row.append(&replacement_entry);
 
         let regex_check = gtk::CheckButton::builder()
-            .tooltip_text("Use regex")
+            .tooltip_text(cat.gtk_tooltip_regex)
             .label(".*")
             .build();
         rule_row.append(&regex_check);

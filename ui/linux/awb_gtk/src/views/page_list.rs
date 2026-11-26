@@ -1,6 +1,7 @@
 // SPDX-FileCopyrightText: 2026 Thomas Vincent <thomasvincent@gmail.com>
 // SPDX-License-Identifier: MIT
 
+use awb_domain::i18n::Locale;
 use gtk::prelude::*;
 
 pub struct PageList {
@@ -13,6 +14,7 @@ pub struct PageList {
 
 impl PageList {
     pub fn new() -> Self {
+        let cat = Locale::resolve(None).catalog();
         let container = gtk::Box::builder()
             .orientation(gtk::Orientation::Vertical)
             .vexpand(true)
@@ -20,7 +22,7 @@ impl PageList {
 
         // Search bar
         let search_entry = gtk::SearchEntry::builder()
-            .placeholder_text("Search pages...")
+            .placeholder_text(cat.gtk_search_pages)
             .margin_start(5)
             .margin_end(5)
             .margin_top(5)

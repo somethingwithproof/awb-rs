@@ -2,6 +2,7 @@
 // SPDX-License-Identifier: MIT
 
 use anyhow::{Context, Result};
+use awb_domain::i18n::{Locale, fmt1};
 use awb_security::{CredentialPort, KeyringCredentialStore};
 use dialoguer::{Input, Password};
 use secrecy::SecretString;
@@ -12,31 +13,31 @@ pub async fn setup(
     consumer_key: String,
     access_token: String,
     profile: String,
+    locale: Locale,
 ) -> Result<()> {
     use awb_domain::profile::{AuthMethod, Profile, ThrottlePolicy};
+    let cat = locale.catalog();
 
     // Validate profile name to prevent path traversal
     if !profile
         .chars()
         .all(|c| c.is_alphanumeric() || c == '-' || c == '_')
     {
-        anyhow::bail!(
-            "Profile name must contain only alphanumeric characters, hyphens, and underscores"
-        );
+        anyhow::bail!("{}", cat.err_invalid_profile_name);
     }
 
-    println!("Setting up OAuth 1.0a for {}", wiki);
+    println!("{}", fmt1(cat.msg_oauth1_setup, "wiki", wiki.as_str()));
 
     // Prompt for secrets interactively (never via CLI args)
     let consumer_secret = Password::new()
-        .with_prompt("OAuth consumer secret")
+        .with_prompt(cat.prompt_consumer_secret)
         .interact()
-        .context("Failed to read consumer secret")?;
+        .context(cat.err_read_consumer_secret)?;
 
     let access_secret = Password::new()
-        .with_prompt("OAuth access secret")
+        .with_prompt(cat.prompt_access_secret)
         .interact()
-        .context("Failed to read access secret")?;
+        .context(cat.err_read_access_secret)?;
 
     // Create profile with OAuth1 auth
     let auth_method = AuthMethod::OAuth1 {
@@ -67,45 +68,48 @@ pub async fn setup(
 
     store
         .set_oauth_token(&profile, &token_json)
-        .context("Failed to store OAuth credentials in keychain")?;
+        .context(cat.err_store_oauth_keychain)?;
 
     // Save profile
     let profile_path = format!(".awb/profiles/{}.toml", profile);
     tokio::fs::create_dir_all(".awb/profiles")
         .await
-        .context("Failed to create profiles directory")?;
-    let profile_toml =
-        toml::to_string_pretty(&profile_obj).context("Failed to serialize profile")?;
+        .context(cat.err_create_profiles_dir)?;
+    let profile_toml = toml::to_string_pretty(&profile_obj).context(cat.err_serialize_profile)?;
     tokio::fs::write(&profile_path, profile_toml)
         .await
-        .context(format!("Failed to write profile to {}", profile_path))?;
+        .context(fmt1(cat.err_write_profile, "path", &profile_path))?;
 
-    println!("✓ OAuth 1.0a credentials saved to profile '{}'", profile);
-    println!("✓ Profile saved to {}", profile_path);
+    println!("✓ {}", fmt1(cat.msg_oauth1_saved, "profile", &profile));
+    println!("✓ {}", fmt1(cat.msg_profile_saved, "path", &profile_path));
 
     Ok(())
 }
 
-pub async fn authorize(wiki: Url, client_id: String, profile: String) -> Result<()> {
+pub async fn authorize(
+    wiki: Url,
+    client_id: String,
+    profile: String,
+    locale: Locale,
+) -> Result<()> {
     use awb_mw_api::oauth::{OAuth2Config, oauth2_authorization_url, oauth2_exchange_code};
+    let cat = locale.catalog();
 
     // Validate profile name to prevent path traversal
     if !profile
         .chars()
         .all(|c| c.is_alphanumeric() || c == '-' || c == '_')
     {
-        anyhow::bail!(
-            "Profile name must contain only alphanumeric characters, hyphens, and underscores"
-        );
+        anyhow::bail!("{}", cat.err_invalid_profile_name);
     }
 
-    println!("Starting OAuth 2.0 authorization flow for {}", wiki);
+    println!("{}", fmt1(cat.msg_oauth2_start, "wiki", wiki.as_str()));
 
     // Prompt for client secret interactively (never via CLI args)
     let client_secret = Password::new()
-        .with_prompt("OAuth 2.0 client secret")
+        .with_prompt(cat.prompt_client_secret)
         .interact()
-        .context("Failed to read client secret")?;
+        .context(cat.err_read_client_secret)?;
 
     // Build OAuth2 config
     // Note: These endpoints are MediaWiki-specific and may need to be customized
@@ -130,35 +134,35 @@ pub async fn authorize(wiki: Url, client_id: String, profile: String) -> Result<
     // Generate authorization URL with PKCE
     let (auth_url, state, pkce_verifier) = oauth2_authorization_url(&config)
         .await
-        .context("Failed to generate authorization URL")?;
+        .context(cat.err_generate_auth_url)?;
 
-    println!("\n🔐 Please visit this URL to authorize:");
+    println!("\n🔐 {}", cat.msg_visit_auth_url);
     println!("{}\n", auth_url);
-    println!("After authorizing, you will be redirected to a callback URL.");
-    println!("Copy the 'code' parameter from the URL and paste it here.\n");
+    println!("{}", cat.msg_oauth2_redirect_info);
+    println!("{}\n", cat.msg_oauth2_paste_code);
 
     let code: String = Input::new()
-        .with_prompt("Authorization code")
+        .with_prompt(cat.prompt_auth_code)
         .interact_text()
-        .context("Failed to read authorization code")?;
+        .context(cat.err_read_auth_code)?;
 
     let received_state: String = Input::new()
-        .with_prompt("State parameter from redirect URL")
+        .with_prompt(cat.prompt_state_param)
         .interact_text()
-        .context("Failed to read state")?;
+        .context(cat.err_read_state)?;
 
     // Exchange code for token with PKCE verifier
-    println!("Exchanging authorization code for access token...");
+    println!("{}", cat.msg_exchanging_code);
     let token = oauth2_exchange_code(&config, &code, &state, &received_state, &pkce_verifier)
         .await
-        .context("Failed to exchange authorization code")?;
+        .context(cat.err_exchange_code)?;
 
     // Store tokens in OS keychain
     let store = KeyringCredentialStore::new();
-    let token_json = serde_json::to_string(&token).context("Failed to serialize token")?;
+    let token_json = serde_json::to_string(&token).context(cat.err_serialize_token)?;
     store
         .set_oauth_token(&profile, &token_json)
-        .context("Failed to store OAuth token in keychain")?;
+        .context(cat.err_store_token_keychain)?;
 
     // Create and save profile
     use awb_domain::profile::{AuthMethod, Profile, ThrottlePolicy};
@@ -182,21 +186,20 @@ pub async fn authorize(wiki: Url, client_id: String, profile: String) -> Result<
     let profile_path = format!(".awb/profiles/{}.toml", profile);
     tokio::fs::create_dir_all(".awb/profiles")
         .await
-        .context("Failed to create profiles directory")?;
-    let profile_toml =
-        toml::to_string_pretty(&profile_obj).context("Failed to serialize profile")?;
+        .context(cat.err_create_profiles_dir)?;
+    let profile_toml = toml::to_string_pretty(&profile_obj).context(cat.err_serialize_profile)?;
     tokio::fs::write(&profile_path, profile_toml)
         .await
-        .context(format!("Failed to write profile to {}", profile_path))?;
+        .context(fmt1(cat.err_write_profile, "path", &profile_path))?;
 
-    println!(
-        "✓ OAuth 2.0 token obtained and saved to profile '{}'",
-        profile
-    );
-    println!("✓ Profile saved to {}", profile_path);
+    println!("✓ {}", fmt1(cat.msg_oauth2_saved, "profile", &profile));
+    println!("✓ {}", fmt1(cat.msg_profile_saved, "path", &profile_path));
 
     if let Some(expires) = token.expires_in {
-        println!("ℹ Token will expire in {} seconds", expires);
+        println!(
+            "ℹ {}",
+            fmt1(cat.msg_token_expires, "seconds", &expires.to_string())
+        );
     }
 
     Ok(())

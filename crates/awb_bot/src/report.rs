@@ -109,42 +109,91 @@ impl BotReport {
 
     /// Generate human-readable summary
     pub fn to_summary(&self) -> String {
+        self.to_summary_localized(awb_domain::i18n::Locale::En)
+    }
+
+    /// Generate localized human-readable summary
+    pub fn to_summary_localized(&self, locale: awb_domain::i18n::Locale) -> String {
+        let cat = locale.catalog();
         let mut summary = String::new();
-        summary.push_str("=== Bot Run Summary ===\n");
+        summary.push_str(&format!("{}\n", cat.report_header));
         summary.push_str(&format!(
-            "Started:  {}\n",
+            "{:<9} {}\n",
+            format!("{}:", cat.report_started),
             self.start_time.format("%Y-%m-%d %H:%M:%S UTC")
         ));
         summary.push_str(&format!(
-            "Finished: {}\n",
+            "{:<9} {}\n",
+            format!("{}:", cat.report_finished),
             self.end_time.format("%Y-%m-%d %H:%M:%S UTC")
         ));
-        summary.push_str(&format!("Duration: {:.2} seconds\n", self.elapsed_secs));
         summary.push_str(&format!(
-            "Status:   {}\n",
+            "{:<9} {}\n",
+            format!("{}:", cat.report_duration),
+            awb_domain::i18n::fmt1(
+                cat.report_seconds,
+                "seconds",
+                &format!("{:.2}", self.elapsed_secs)
+            )
+        ));
+        summary.push_str(&format!(
+            "{:<9} {}\n",
+            format!("{}:", cat.report_status),
             if self.completed {
-                "Completed"
+                cat.report_completed
             } else {
-                "Interrupted"
+                cat.report_interrupted
             }
         ));
         if let Some(reason) = &self.stop_reason {
-            summary.push_str(&format!("Reason:   {}\n", reason));
+            summary.push_str(&format!(
+                "{:<9} {}\n",
+                format!("{}:", cat.report_reason),
+                reason
+            ));
         }
-        summary.push_str("\n--- Statistics ---\n");
-        summary.push_str(&format!("Processed: {}\n", self.pages_processed));
-        summary.push_str(&format!("Edited:    {}\n", self.pages_edited));
-        summary.push_str(&format!("Skipped:   {}\n", self.pages_skipped));
-        summary.push_str(&format!("Errors:    {}\n", self.pages_errored));
+        summary.push_str(&format!("\n{}\n", cat.report_stats_header));
+        summary.push_str(&format!(
+            "{:<10} {}\n",
+            format!("{}:", cat.report_processed),
+            self.pages_processed
+        ));
+        summary.push_str(&format!(
+            "{:<10} {}\n",
+            format!("{}:", cat.report_edited),
+            self.pages_edited
+        ));
+        summary.push_str(&format!(
+            "{:<10} {}\n",
+            format!("{}:", cat.report_skipped),
+            self.pages_skipped
+        ));
+        summary.push_str(&format!(
+            "{:<10} {}\n",
+            format!("{}:", cat.report_errors),
+            self.pages_errored
+        ));
 
         if self.pages_processed > 0 {
             let edit_rate = (self.pages_edited as f64 / self.pages_processed as f64) * 100.0;
-            summary.push_str(&format!("Edit rate: {:.1}%\n", edit_rate));
+            summary.push_str(&format!(
+                "{:<10} {:.1}%\n",
+                format!("{}:", cat.report_edit_rate),
+                edit_rate
+            ));
         }
 
         if self.elapsed_secs > 0.0 {
             let pages_per_sec = self.pages_processed as f64 / self.elapsed_secs;
-            summary.push_str(&format!("Speed:     {:.2} pages/sec\n", pages_per_sec));
+            summary.push_str(&format!(
+                "{:<10} {}\n",
+                format!("{}:", cat.report_speed),
+                awb_domain::i18n::fmt1(
+                    cat.report_pages_per_sec,
+                    "rate",
+                    &format!("{:.2}", pages_per_sec)
+                )
+            ));
         }
 
         summary

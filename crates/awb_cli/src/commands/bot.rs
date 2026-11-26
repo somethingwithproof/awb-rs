@@ -3,6 +3,7 @@
 
 use anyhow::{Context, Result};
 use awb_bot::{BotConfig, BotRunner, Checkpoint};
+use awb_domain::i18n::{Locale, fmt1};
 use awb_domain::profile::AuthMethod;
 use awb_domain::rules::RuleSet;
 use awb_engine::general_fixes::FixRegistry;
@@ -26,22 +27,25 @@ pub struct BotRunArgs {
     pub skip_no_change: bool,
     pub skip_on_warning: bool,
     pub log_every_n: u32,
+    pub locale: Locale,
 }
 
 pub async fn run(args: BotRunArgs) -> Result<()> {
-    println!("{}", style("AWB-RS Bot Mode").bold().cyan());
-    println!("Wiki: {}", args.wiki);
-    println!("Profile: {}", args.profile_path.display());
+    let cat = args.locale.catalog();
+    println!("{}", style(cat.bot_title).bold().cyan());
+    println!("{}: {}", cat.label_wiki, args.wiki);
+    println!("{}: {}", cat.label_profile, args.profile_path.display());
     println!(
-        "Mode: {}",
+        "{}: {}",
+        cat.label_mode,
         if args.dry_run {
-            style("DRY-RUN").yellow()
+            style(cat.mode_dry_run).yellow()
         } else {
-            style("AUTONOMOUS").green().bold()
+            style(cat.mode_autonomous).green().bold()
         }
     );
     if let Some(max) = args.max_edits {
-        println!("Max edits: {}", max);
+        println!("{}: {}", cat.label_max_edits, max);
     }
     println!();
 
@@ -49,41 +53,41 @@ pub async fn run(args: BotRunArgs) -> Result<()> {
     let config_store = TomlConfigStore::new(&args.profile_path);
     let profile = config_store
         .load_profile(&args.auth_profile)
-        .context("Failed to load profile. Create one first or use a different auth-profile.")?;
+        .context(cat.err_load_profile)?;
 
     // Get credentials
     let cred_store = InMemoryCredentialStore::new();
     let password = cred_store
         .get_password(&args.auth_profile)
-        .context("No stored credentials found. Run 'login' command first.")?;
+        .context(cat.err_no_stored_creds)?;
 
     // Create client and login
     let client = ReqwestMwClient::new(args.wiki.clone(), profile.throttle_policy.clone())
-        .context("Failed to create HTTP client")?;
+        .context(cat.err_create_http_client)?;
 
-    print!("Logging in... ");
+    print!("{}", cat.msg_logging_in);
     let username = match &profile.auth_method {
         AuthMethod::BotPassword { username } => username.clone(),
         AuthMethod::OAuth2 { .. } => {
-            anyhow::bail!("OAuth2 not yet implemented");
+            anyhow::bail!("{}", cat.err_oauth2_unimplemented);
         }
         AuthMethod::OAuth1 { .. } => {
-            anyhow::bail!("OAuth1 not yet implemented");
+            anyhow::bail!("{}", cat.err_oauth1_unimplemented);
         }
     };
 
     client
         .login_bot_password(&username, &password)
         .await
-        .context("Login failed")?;
+        .context(cat.err_login_failed)?;
     println!("{}", style("✓").green().bold());
 
     // Fetch CSRF token
-    print!("Fetching CSRF token... ");
+    print!("{}", cat.msg_fetching_csrf);
     client
         .fetch_csrf_token()
         .await
-        .context("Failed to fetch CSRF token")?;
+        .context(cat.err_fetch_csrf)?;
     println!("{}", style("✓").green().bold());
 
     // Load rules and build engine
@@ -91,8 +95,8 @@ pub async fn run(args: BotRunArgs) -> Result<()> {
     let registry = FixRegistry::with_defaults();
     let enabled_fixes = HashSet::new(); // In production, load from profile
 
-    let engine = TransformEngine::new(&ruleset, registry, enabled_fixes)
-        .context("Failed to create transform engine")?;
+    let engine =
+        TransformEngine::new(&ruleset, registry, enabled_fixes).context(cat.err_create_engine)?;
 
     // For demo purposes, generate a simple page list
     // In real usage, this would come from the profile configuration or a list command
@@ -102,7 +106,10 @@ pub async fn run(args: BotRunArgs) -> Result<()> {
         "Test Page 3".to_string(),
     ];
 
-    println!("Processing {} pages...", pages.len());
+    println!(
+        "{}",
+        fmt1(cat.msg_processing_pages, "count", &pages.len().to_string())
+    );
     println!();
 
     // Configure bot
@@ -119,8 +126,15 @@ pub async fn run(args: BotRunArgs) -> Result<()> {
     // Load or create checkpoint
     let checkpoint = if let Some(ref path) = args.checkpoint_path {
         if path.exists() {
-            println!("Loading checkpoint from {}...", path.display());
-            Checkpoint::load(path).context("Failed to load checkpoint")?
+            println!(
+                "{}",
+                fmt1(
+                    cat.msg_loading_checkpoint,
+                    "path",
+                    &path.display().to_string()
+                )
+            );
+            Checkpoint::load(path).context(cat.err_load_checkpoint)?
         } else {
             Checkpoint::new()
         }
@@ -131,8 +145,12 @@ pub async fn run(args: BotRunArgs) -> Result<()> {
     // Create and run bot
     let mut bot_runner = if checkpoint.next_index() > 0 {
         println!(
-            "Resuming from page {} (checkpoint)",
-            checkpoint.next_index() + 1
+            "{}",
+            fmt1(
+                cat.msg_resuming_checkpoint,
+                "page",
+                &(checkpoint.next_index() + 1).to_string()
+            )
         );
         BotRunner::with_checkpoint(bot_config, client, engine, pages, checkpoint)
     } else {
@@ -145,14 +163,22 @@ pub async fn run(args: BotRunArgs) -> Result<()> {
     let report = match bot_runner.run().await {
         Ok(report) => report,
         Err(e) => {
-            eprintln!("{} Bot error: {}", style("✗").red(), e);
+            eprintln!(
+                "{} {}",
+                style("✗").red(),
+                fmt1(cat.msg_bot_error, "error", &e.to_string())
+            );
 
             // Save checkpoint on error
             if let Some(path) = args.checkpoint_path {
                 if let Err(e) = bot_runner.save_checkpoint(&path) {
-                    eprintln!("{} Failed to save checkpoint: {}", style("✗").red(), e);
+                    eprintln!(
+                        "{} {}",
+                        style("✗").red(),
+                        fmt1(cat.msg_failed_save_checkpoint, "error", &e.to_string())
+                    );
                 } else {
-                    println!("{} Checkpoint saved for resume", style("ℹ").cyan());
+                    println!("{} {}", style("ℹ").cyan(), cat.msg_checkpoint_saved);
                 }
             }
 
@@ -164,13 +190,13 @@ pub async fn run(args: BotRunArgs) -> Result<()> {
     if let Some(path) = args.checkpoint_path {
         bot_runner
             .save_checkpoint(&path)
-            .context("Failed to save final checkpoint")?;
+            .context(cat.err_save_final_checkpoint)?;
     }
 
     // Display report
     println!();
     println!("{}", style("═".repeat(60)).dim());
-    println!("{}", report.to_summary());
+    println!("{}", report.to_summary_localized(args.locale));
     println!("{}", style("═".repeat(60)).dim());
 
     // Save JSON report
@@ -180,8 +206,15 @@ pub async fn run(args: BotRunArgs) -> Result<()> {
     ));
     tokio::fs::write(&report_path, report.to_json()?)
         .await
-        .context("Failed to save report")?;
-    println!("Report saved to: {}", report_path.display());
+        .context(cat.err_save_report)?;
+    println!(
+        "{}",
+        fmt1(
+            cat.msg_report_saved,
+            "path",
+            &report_path.display().to_string()
+        )
+    );
 
     Ok(())
 }

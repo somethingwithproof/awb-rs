@@ -2,6 +2,7 @@
 // SPDX-License-Identifier: MIT
 
 use adw::prelude::*;
+use awb_domain::i18n::{Locale, fmt1};
 use gtk::prelude::*;
 use gtk::{gio, glib};
 use libadwaita as adw;
@@ -24,10 +25,16 @@ pub struct MainWindow {
 
 impl MainWindow {
     pub fn new(app: &adw::Application) -> Self {
+        let locale = Locale::resolve(None);
+        if locale.is_rtl() {
+            gtk::Widget::set_default_direction(gtk::TextDirection::Rtl);
+        }
+        let cat = locale.catalog();
+
         // Create the main window
         let window = adw::ApplicationWindow::builder()
             .application(app)
-            .title("AWBrowser - AutoWikiBrowser Rust Edition")
+            .title(cat.gtk_window_title)
             .default_width(1400)
             .default_height(800)
             .build();
@@ -43,18 +50,18 @@ impl MainWindow {
         // Build the menu
         let menu = gio::Menu::new();
         let file_menu = gio::Menu::new();
-        file_menu.append(Some("Login..."), Some("app.login"));
-        file_menu.append(Some("Quit"), Some("app.quit"));
-        menu.append_submenu(Some("File"), &file_menu);
+        file_menu.append(Some(cat.gtk_menu_login), Some("app.login"));
+        file_menu.append(Some(cat.gtk_menu_quit), Some("app.quit"));
+        menu.append_submenu(Some(cat.gtk_menu_file), &file_menu);
 
         let edit_menu = gio::Menu::new();
-        edit_menu.append(Some("Apply Rules"), Some("app.apply_rules"));
-        edit_menu.append(Some("Preview Changes"), Some("app.preview"));
-        menu.append_submenu(Some("Edit"), &edit_menu);
+        edit_menu.append(Some(cat.gtk_menu_apply_rules), Some("app.apply_rules"));
+        edit_menu.append(Some(cat.gtk_menu_preview), Some("app.preview"));
+        menu.append_submenu(Some(cat.gtk_menu_edit), &edit_menu);
 
         let help_menu = gio::Menu::new();
-        help_menu.append(Some("About"), Some("app.about"));
-        menu.append_submenu(Some("Help"), &help_menu);
+        help_menu.append(Some(cat.gtk_menu_about), Some("app.about"));
+        menu.append_submenu(Some(cat.gtk_menu_help), &help_menu);
 
         menu_button.set_menu_model(Some(&menu));
         header_bar.pack_end(&menu_button);
@@ -62,7 +69,7 @@ impl MainWindow {
         // Create toolbar buttons
         let login_button = gtk::Button::builder()
             .icon_name("system-users-symbolic")
-            .tooltip_text("Login to wiki")
+            .tooltip_text(cat.gtk_tooltip_login)
             .build();
         header_bar.pack_start(&login_button);
 
@@ -78,7 +85,7 @@ impl MainWindow {
             .orientation(gtk::Orientation::Vertical)
             .width_request(300)
             .build();
-        left_box.append(&gtk::Label::new(Some("Pages")));
+        left_box.append(&gtk::Label::new(Some(cat.gtk_panel_pages)));
         left_box.append(page_list.widget());
         main_paned.set_start_child(Some(&left_box));
 
@@ -95,7 +102,7 @@ impl MainWindow {
             .hexpand(true)
             .vexpand(true)
             .build();
-        editor_box.append(&gtk::Label::new(Some("Editor")));
+        editor_box.append(&gtk::Label::new(Some(cat.gtk_panel_editor)));
         editor_box.append(editor.widget());
         center_right_paned.set_start_child(Some(&editor_box));
 
@@ -105,7 +112,7 @@ impl MainWindow {
             .orientation(gtk::Orientation::Vertical)
             .width_request(300)
             .build();
-        right_box.append(&gtk::Label::new(Some("Rules")));
+        right_box.append(&gtk::Label::new(Some(cat.gtk_panel_rules)));
         right_box.append(rule_editor.widget());
         center_right_paned.set_end_child(Some(&right_box));
 
@@ -122,13 +129,14 @@ impl MainWindow {
             .build();
 
         let status_label = gtk::Label::builder()
-            .label("Ready")
+            .label(cat.gtk_status_ready)
             .hexpand(true)
             .xalign(0.0)
             .build();
         status_bar.append(&status_label);
 
-        let page_count_label = gtk::Label::new(Some("0 pages"));
+        let initial_pages = fmt1(cat.gtk_pages_count, "count", "0");
+        let page_count_label = gtk::Label::new(Some(&initial_pages));
         status_bar.append(&page_count_label);
 
         let progress_bar = gtk::ProgressBar::builder().width_request(150).build();
@@ -216,6 +224,7 @@ impl MainWindow {
     }
 
     fn show_about_dialog(parent: &adw::ApplicationWindow) {
+        let cat = Locale::resolve(None).catalog();
         let about = adw::AboutDialog::builder()
             .application_name("AWBrowser")
             .application_icon("text-editor-symbolic")
@@ -224,7 +233,7 @@ impl MainWindow {
             .license_type(gtk::License::MitX11)
             .website("https://github.com/thomasvincent/awb-rs")
             .issue_url("https://github.com/thomasvincent/awb-rs/issues")
-            .comments("A modern WikiText editor built with Rust and GTK4")
+            .comments(cat.gtk_about_comments)
             .build();
 
         about.present(Some(parent));

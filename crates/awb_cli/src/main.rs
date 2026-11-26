@@ -2,7 +2,8 @@
 // SPDX-License-Identifier: MIT
 
 use anyhow::Result;
-use clap::{Parser, Subcommand};
+use awb_domain::i18n::{Locale, extract_cli_lang};
+use clap::{CommandFactory, FromArgMatches, Parser, Subcommand};
 use std::path::PathBuf;
 use url::Url;
 
@@ -12,6 +13,10 @@ mod commands;
 #[command(name = "awb-rs")]
 #[command(version, about = "AutoWikiBrowser in Rust - Wikipedia bot framework", long_about = None)]
 struct Cli {
+    /// Display language (e.g. en, de, ja, zh-CN, pt-BR)
+    #[arg(long, global = true)]
+    lang: Option<String>,
+
     #[command(subcommand)]
     command: Commands,
 }
@@ -184,6 +189,23 @@ enum ExportFormat {
     Plain,
 }
 
+fn localized_command(locale: Locale) -> clap::Command {
+    let cat = locale.catalog();
+    Cli::command()
+        .about(cat.cli_about)
+        .mut_arg("lang", |a| a.help(cat.cli_opt_lang))
+        .mut_subcommand("login", |c| c.about(cat.cli_cmd_login))
+        .mut_subcommand("list", |c| c.about(cat.cli_cmd_list))
+        .mut_subcommand("run", |c| c.about(cat.cli_cmd_run))
+        .mut_subcommand("export-log", |c| c.about(cat.cli_cmd_export_log))
+        .mut_subcommand("bot", |c| c.about(cat.cli_cmd_bot))
+        .mut_subcommand("o-auth", |c| {
+            c.about(cat.cli_cmd_oauth)
+                .mut_subcommand("setup", |s| s.about(cat.cli_cmd_oauth_setup))
+                .mut_subcommand("authorize", |s| s.about(cat.cli_cmd_oauth_authorize))
+        })
+}
+
 #[tokio::main]
 async fn main() -> Result<()> {
     // Initialize telemetry
@@ -194,28 +216,34 @@ async fn main() -> Result<()> {
         human_output: true,
     })?;
 
-    let cli = Cli::parse();
+    let raw_args: Vec<String> = std::env::args().collect();
+    let initial_locale = Locale::resolve(extract_cli_lang(&raw_args).as_deref());
+    let matches = localized_command(initial_locale).get_matches_from(raw_args);
+    let cli = Cli::from_arg_matches(&matches)?;
+    let locale = Locale::resolve(cli.lang.as_deref());
 
     match cli.command {
         Commands::Login {
             wiki,
             username,
             profile,
-        } => commands::login::run(wiki, username, profile).await,
+        } => commands::login::run(wiki, username, profile, locale).await,
         Commands::List {
             wiki,
             source,
             query,
             limit,
-        } => commands::list::run(wiki, source, query, limit).await,
+        } => commands::list::run(wiki, source, query, limit, locale).await,
         Commands::Run {
             wiki,
             profile,
             batch,
             dry_run,
             auth_profile,
-        } => commands::run::run(wiki, profile, batch, dry_run, auth_profile).await,
-        Commands::ExportLog { format, output } => commands::export::run(format, output).await,
+        } => commands::run::run(wiki, profile, batch, dry_run, auth_profile, locale).await,
+        Commands::ExportLog { format, output } => {
+            commands::export::run(format, output, locale).await
+        }
         Commands::Bot {
             wiki,
             profile,
@@ -237,6 +265,7 @@ async fn main() -> Result<()> {
                 skip_no_change,
                 skip_on_warning,
                 log_every_n,
+                locale,
             })
             .await
         }
@@ -246,12 +275,12 @@ async fn main() -> Result<()> {
                 consumer_key,
                 access_token,
                 profile,
-            } => commands::oauth::setup(wiki, consumer_key, access_token, profile).await,
+            } => commands::oauth::setup(wiki, consumer_key, access_token, profile, locale).await,
             OAuthCommands::Authorize {
                 wiki,
                 client_id,
                 profile,
-            } => commands::oauth::authorize(wiki, client_id, profile).await,
+            } => commands::oauth::authorize(wiki, client_id, profile, locale).await,
         },
     }
 }

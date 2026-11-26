@@ -2,6 +2,7 @@
 // SPDX-License-Identifier: MIT
 
 use adw::prelude::*;
+use awb_domain::i18n::Locale;
 use gtk::prelude::*;
 use libadwaita as adw;
 
@@ -17,25 +18,29 @@ pub struct LoginDialog {
 
 impl LoginDialog {
     pub fn new(_parent: &adw::ApplicationWindow) -> Self {
+        let cat = Locale::resolve(None).catalog();
+
         // Create preference groups
         let preferences_group = adw::PreferencesGroup::builder()
-            .title("Wiki Connection")
-            .description("Enter your MediaWiki credentials")
+            .title(cat.gtk_login_group_title)
+            .description(cat.gtk_login_group_desc)
             .build();
 
         // Wiki URL entry
         let wiki_url_entry = adw::EntryRow::builder()
-            .title("Wiki URL")
+            .title(cat.gtk_login_wiki_url)
             .text("https://en.wikipedia.org/w/api.php")
             .build();
         preferences_group.add(&wiki_url_entry);
 
         // Username entry
-        let username_entry = adw::EntryRow::builder().title("Username").build();
+        let username_entry = adw::EntryRow::builder().title(cat.label_username).build();
         preferences_group.add(&username_entry);
 
         // Password entry
-        let password_entry = adw::PasswordEntryRow::builder().title("Password").build();
+        let password_entry = adw::PasswordEntryRow::builder()
+            .title(cat.gtk_login_password)
+            .build();
         preferences_group.add(&password_entry);
 
         // Create preferences page
@@ -44,7 +49,7 @@ impl LoginDialog {
 
         // Create the dialog
         let dialog = adw::Dialog::builder()
-            .title("Login to Wiki")
+            .title(cat.gtk_login_dialog_title)
             .content_width(450)
             .content_height(400)
             .build();
@@ -52,11 +57,11 @@ impl LoginDialog {
         // Create toolbar view for dialog content
         let header_bar = adw::HeaderBar::new();
 
-        let cancel_button = gtk::Button::builder().label("Cancel").build();
+        let cancel_button = gtk::Button::builder().label(cat.gtk_btn_cancel).build();
         header_bar.pack_start(&cancel_button);
 
         let login_button = gtk::Button::builder()
-            .label("Login")
+            .label(cat.gtk_btn_login)
             .css_classes(vec!["suggested-action"])
             .build();
         header_bar.pack_end(&login_button);
