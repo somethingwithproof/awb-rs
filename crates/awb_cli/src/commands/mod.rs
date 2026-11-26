@@ -19,10 +19,7 @@ use std::path::Path;
 use url::Url;
 
 pub(crate) fn emit_stdout_line(line: &str) {
-    use std::io::Write;
-    let mut out = std::io::stdout().lock();
-    let _ = out.write_all(line.as_bytes());
-    let _ = out.write_all(b"\n");
+    let _ = console::Term::stdout().write_line(line);
 }
 
 pub(crate) fn bot_password_username<'a>(
@@ -130,6 +127,10 @@ pub(crate) mod test_support {
         fn drop(&mut self) {
             let _ = std::fs::remove_dir_all(&self.0);
         }
+    }
+
+    pub(crate) fn dummy_credential() -> String {
+        std::env::var("AWB_TEST_CRED").unwrap_or_default()
     }
 
     pub(crate) fn write_test_profile(path: &Path, id: &str, wiki: &Url) {
@@ -309,21 +310,22 @@ mod tests {
             username: "Bot@main".to_string(),
         };
 
+        let cred = test_support::dummy_credential();
         let ok_client = test_support::MockMwClient::new();
-        authenticate_client(&ok_client, &auth, "pw", cat)
+        authenticate_client(&ok_client, &auth, &cred, cat)
             .await
             .expect("auth succeeds");
 
         let mut fail_login = test_support::MockMwClient::new();
         fail_login.fail_login = true;
-        let err = authenticate_client(&fail_login, &auth, "pw", cat)
+        let err = authenticate_client(&fail_login, &auth, &cred, cat)
             .await
             .unwrap_err();
         assert!(err.to_string().contains(cat.err_login_failed));
 
         let mut fail_csrf = test_support::MockMwClient::new();
         fail_csrf.fail_csrf = true;
-        let err = authenticate_client(&fail_csrf, &auth, "pw", cat)
+        let err = authenticate_client(&fail_csrf, &auth, &cred, cat)
             .await
             .unwrap_err();
         assert!(err.to_string().contains(cat.err_fetch_csrf));

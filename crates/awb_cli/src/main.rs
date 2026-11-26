@@ -315,22 +315,21 @@ mod tests {
                 ("run", cat.cli_cmd_run),
                 ("export-log", cat.cli_cmd_export_log),
                 ("bot", cat.cli_cmd_bot),
-                ("o-auth", cat.cli_cmd_oauth),
             ] {
-                let sub = cmd
-                    .find_subcommand(name)
-                    .unwrap_or_else(|| panic!("subcommand {name} missing"));
+                let sub = cmd.find_subcommand(name).expect("subcommand present");
                 assert_eq!(
                     sub.get_about().map(|s| s.to_string()),
-                    Some(expected_about.to_string()),
-                    "about mismatch for subcommand {name} in {}",
-                    locale.code()
+                    Some(expected_about.to_string())
                 );
             }
 
             let oauth = cmd
                 .find_subcommand("o-auth")
                 .expect("o-auth subcommand present");
+            assert_eq!(
+                oauth.get_about().map(|s| s.to_string()),
+                Some(cat.cli_cmd_oauth.to_string())
+            );
             assert_eq!(
                 oauth
                     .find_subcommand("setup")
