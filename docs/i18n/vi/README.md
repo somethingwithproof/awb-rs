@@ -54,11 +54,11 @@ CLI → Lõi xử lý → API → MediaWiki
 
 ## Ngôn ngữ được hỗ trợ
 
-Giao diện dòng lệnh, báo cáo bot và giao diện GTK4 hỗ trợ 45 ngôn ngữ (bao gồm 6 ngôn ngữ RTL: `ar`, `ar-EG`, `ar-MA`, `fa`, `he` và `ur`). Truyền tham số `--lang <LANG>` hoặc thiết lập biến môi trường `AWB_LANG` để ghi đè cơ chế tự nhận diện ngôn ngữ hệ thống. Xem bảng ngôn ngữ đầy đủ tại [README.md](../../../README.md).
+Giao diện dòng lệnh, báo cáo bot và giao diện GTK4 hỗ trợ 45 ngôn ngữ (bao gồm 6 ngôn ngữ RTL: `ar`, `ar-EG`, `ar-MA`, `fa`, `he` và `ur`). Dùng `--lang <LANG>` trong CLI, hoặc đặt `AWB_LANG` hay các biến ngôn ngữ POSIX (`LC_ALL`/`LC_MESSAGES`/`LANG`) cho cả CLI và giao diện GTK4. Xem bảng ngôn ngữ đầy đủ tại [README.md](../../../README.md).
 
 ## Yêu cầu hệ thống
 
-- **Rust**: Phiên bản 1.85 trở lên (MSRV)
+- **Rust**: Phiên bản 1.94 trở lên (MSRV)
 - **Cargo**: Đi kèm sẵn khi cài đặt Rust
 
 ## Cài đặt
@@ -74,7 +74,7 @@ cd awb-rs
 cargo build --workspace --release
 
 # Cài đặt tệp thực thi
-cargo install --path awb-cli
+cargo install --path crates/awb_cli
 ```
 
 ## Phát triển
@@ -239,7 +239,7 @@ end
 ### Plugin WebAssembly
 
 ```rust
-// Biên dịch sang WASM bằng lệnh: cargo build --target wasm32-wasi
+// Biên dịch sang WASM bằng lệnh: cargo build --target wasm32-wasip1
 #[no_mangle]
 pub extern "C" fn transform(content: &str) -> String {
     content.replace("foo", "bar")

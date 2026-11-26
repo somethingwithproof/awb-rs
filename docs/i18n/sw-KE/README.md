@@ -54,11 +54,11 @@ CLI → Msingi → API → MediaWiki
 
 ## Lugha Zinazotumika
 
-CLI, ripoti za bot, na kiolesura cha GTK4 vinasaidia lugha 45 (ikijumuisha lugha 6 za RTL: `ar`, `ar-EG`, `ar-MA`, `fa`, `he`, na `ur`). Tumia `--lang <LANG>` au weka `AWB_LANG` ili kubatilisha utambuzi wa lugha ya mfumo. Tazama [README.md](../../../README.md) kwa jedwali kamili la lugha.
+CLI, ripoti za bot, na kiolesura cha GTK4 vinasaidia lugha 45 (ikijumuisha lugha 6 za RTL: `ar`, `ar-EG`, `ar-MA`, `fa`, `he`, na `ur`). Tumia `--lang <LANG>` katika CLI, au weka `AWB_LANG` au vigezo vya lugha vya POSIX (`LC_ALL`/`LC_MESSAGES`/`LANG`) kwa CLI na kiolesura cha GTK4 vyote viwili. Tazama [README.md](../../../README.md) kwa jedwali kamili la lugha.
 
 ## Mahitaji ya Awali
 
-- **Rust**: Toleo la 1.85 au zaidi (MSRV)
+- **Rust**: Toleo la 1.94 au zaidi (MSRV)
 - **Cargo**: Imejumuishwa na usakinishaji wa Rust
 
 ## Usakinishaji
@@ -74,7 +74,7 @@ cd awb-rs
 cargo build --workspace --release
 
 # Sakinisha faili tekelezi
-cargo install --path awb-cli
+cargo install --path crates/awb_cli
 ```
 
 ## Uendelezaji
@@ -239,7 +239,7 @@ end
 ### Programu-jalizi za WebAssembly
 
 ```rust
-// Kusanya kuwa WASM kwa: cargo build --target wasm32-wasi
+// Kusanya kuwa WASM kwa: cargo build --target wasm32-wasip1
 #[no_mangle]
 pub extern "C" fn transform(content: &str) -> String {
     content.replace("foo", "bar")

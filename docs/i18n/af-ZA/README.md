@@ -54,11 +54,11 @@ CLI → Kern → API → MediaWiki
 
 ## Ondersteunde tale
 
-Die CLI, botverslae en GTK4-gebruikerskoppelvlak ondersteun 45 tale (insluitend 6 RTL-lokaliteite: `ar`, `ar-EG`, `ar-MA`, `fa`, `he`, en `ur`). Verskaf `--lang <LANG>` of stel `AWB_LANG` om outomatiese opsporing van die stelsellokaliteit te oorheers. Sien [README.md](../../../README.md) vir die volledige taaltabel.
+Die CLI, botverslae en GTK4-gebruikerskoppelvlak ondersteun 45 tale (insluitend 6 RTL-lokaliteite: `ar`, `ar-EG`, `ar-MA`, `fa`, `he`, en `ur`). Gebruik `--lang <LANG>` in die CLI, of stel `AWB_LANG` of POSIX-lokaliteitsveranderlikes (`LC_ALL`/`LC_MESSAGES`/`LANG`) vir beide die CLI en die GTK4-gebruikerskoppelvlak. Sien [README.md](../../../README.md) vir die volledige taaltabel.
 
 ## Voorvereistes
 
-- **Rust**: Weergawe 1.85 of hoër (MSRV)
+- **Rust**: Weergawe 1.94 of hoër (MSRV)
 - **Cargo**: Ingesluit by die Rust-installasie
 
 ## Installasie
@@ -74,7 +74,7 @@ cd awb-rs
 cargo build --workspace --release
 
 # Installeer die uitvoerbare lêer
-cargo install --path awb-cli
+cargo install --path crates/awb_cli
 ```
 
 ## Ontwikkeling
@@ -239,7 +239,7 @@ end
 ### WebAssembly-inproppe
 
 ```rust
-// Kompileer na WASM met: cargo build --target wasm32-wasi
+// Kompileer na WASM met: cargo build --target wasm32-wasip1
 #[no_mangle]
 pub extern "C" fn transform(content: &str) -> String {
     content.replace("foo", "bar")

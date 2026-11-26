@@ -54,11 +54,11 @@ CLI → Umutima → API → MediaWiki
 
 ## Indimi Zishyigikiwe
 
-Umurongo w'amabwiriza (CLI), raporo za robo, n'imigaragarire ya GTK4 bishyigikira indimi 45 (harimo indimi 6 za RTL: `ar`, `ar-EG`, `ar-MA`, `fa`, `he`, na `ur`). Koresha `--lang <LANG>` cyangwa ushyireho `AWB_LANG` kugira ngo uhindure ururimi rwa sisitemu ruboneka mu buryo bwikora. Reba [README.md](../../../README.md) kugira ngo ubone imbonerahamwe yuzuye y'indimi.
+Umurongo w'amabwiriza (CLI), raporo za robo, n'imigaragarire ya GTK4 bishyigikira indimi 45 (harimo indimi 6 za RTL: `ar`, `ar-EG`, `ar-MA`, `fa`, `he`, na `ur`). Koresha `--lang <LANG>` muri CLI, cyangwa ushyireho `AWB_LANG` cyangwa impinduka z'ururimi za POSIX (`LC_ALL`/`LC_MESSAGES`/`LANG`) kuri CLI no ku migaragarire ya GTK4. Reba [README.md](../../../README.md) kugira ngo ubone imbonerahamwe yuzuye y'indimi.
 
 ## Ibisabwa Mbere
 
-- **Rust**: Verisiyo 1.85 cyangwa hejuru yayo (MSRV)
+- **Rust**: Verisiyo 1.94 cyangwa hejuru yayo (MSRV)
 - **Cargo**: Ijyana n'iyinjiza rya Rust
 
 ## Iyinjiza
@@ -74,7 +74,7 @@ cd awb-rs
 cargo build --workspace --release
 
 # Gushyiramo porogaramu ikoreshwa
-cargo install --path awb-cli
+cargo install --path crates/awb_cli
 ```
 
 ## Iterambere rya Porogaramu
@@ -239,7 +239,7 @@ end
 ### Imigereka ya WebAssembly
 
 ```rust
-// Hindura muri WASM ukoresheje: cargo build --target wasm32-wasi
+// Hindura muri WASM ukoresheje: cargo build --target wasm32-wasip1
 #[no_mangle]
 pub extern "C" fn transform(content: &str) -> String {
     content.replace("foo", "bar")

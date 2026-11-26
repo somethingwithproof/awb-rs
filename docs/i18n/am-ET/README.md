@@ -54,11 +54,11 @@ CLI → ዋና ንብርብር → API → MediaWiki
 
 ## የሚደገፉ ቋንቋዎች
 
-CLI፣ የቦት ሪፖርቶች እና የGTK4 ተጠቃሚ በይነገጽ 45 ቋንቋዎችን ይደግፋሉ (6 የRTL አካባቢዎችን ጨምሮ፦ `ar`፣ `ar-EG`፣ `ar-MA`፣ `fa`፣ `he` እና `ur`)። የሥርዓቱን አካባቢ ራስ-ሰር መለየት ለመተካት `--lang <LANG>` ያስገቡ ወይም `AWB_LANG` ያቀናብሩ። ሙሉውን የቋንቋዎች ሠንጠረዥ ለማየት [README.md](../../../README.md) ይመልከቱ።
+CLI፣ የቦት ሪፖርቶች እና የGTK4 ተጠቃሚ በይነገጽ 45 ቋንቋዎችን ይደግፋሉ (6 የRTL አካባቢዎችን ጨምሮ፦ `ar`፣ `ar-EG`፣ `ar-MA`፣ `fa`፣ `he` እና `ur`)። በCLI ውስጥ `--lang <LANG>` ይጠቀሙ፣ ወይም ለCLI እና ለGTK4 ተጠቃሚ በይነገጽ ሁለቱም `AWB_LANG` ወይም የPOSIX አካባቢ ተለዋዋጮችን (`LC_ALL`/`LC_MESSAGES`/`LANG`) ያቀናብሩ። ሙሉውን የቋንቋዎች ሠንጠረዥ ለማየት [README.md](../../../README.md) ይመልከቱ።
 
 ## ቅድመ ሁኔታዎች
 
-- **Rust**፦ ስሪት 1.85 ወይም ከዚያ በላይ (MSRV)
+- **Rust**፦ ስሪት 1.94 ወይም ከዚያ በላይ (MSRV)
 - **Cargo**፦ ከRust ጭነት ጋር አብሮ ይመጣል
 
 ## መጫን
@@ -74,7 +74,7 @@ cd awb-rs
 cargo build --workspace --release
 
 # ተፈጻሚውን ፋይል ይጫኑ
-cargo install --path awb-cli
+cargo install --path crates/awb_cli
 ```
 
 ## ልማት
@@ -239,7 +239,7 @@ end
 ### የWebAssembly ተሰኪዎች
 
 ```rust
-// ወደ WASM ለማጠናቀር፦ cargo build --target wasm32-wasi
+// ወደ WASM ለማጠናቀር፦ cargo build --target wasm32-wasip1
 #[no_mangle]
 pub extern "C" fn transform(content: &str) -> String {
     content.replace("foo", "bar")

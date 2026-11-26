@@ -54,11 +54,11 @@ CLI → Àárín Ètò → API → MediaWiki
 
 ## Àwọn Èdè Tí A Ṣe Àtìlẹ́yìn Fún
 
-Ojú ìlà àṣẹ (CLI), àwọn ìròyìn bọ́ọ̀tì, àti ojú-ìṣiṣẹ́ GTK4 ń ṣe àtìlẹ́yìn fún èdè 45 (pẹ̀lú èdè RTL 6: `ar`, `ar-EG`, `ar-MA`, `fa`, `he`, àti `ur`). Lo `--lang <LANG>` tàbí ṣètò `AWB_LANG` láti yí ìdámọ̀ èdè ètò ẹ̀rọ padà. Wo [README.md](../../../README.md) fún tábìlì èdè tí ó pé.
+Ojú ìlà àṣẹ (CLI), àwọn ìròyìn bọ́ọ̀tì, àti ojú-ìṣiṣẹ́ GTK4 ń ṣe àtìlẹ́yìn fún èdè 45 (pẹ̀lú èdè RTL 6: `ar`, `ar-EG`, `ar-MA`, `fa`, `he`, àti `ur`). Lo `--lang <LANG>` nínú CLI, tàbí ṣètò `AWB_LANG` tàbí àwọn onírúurú èdè POSIX (`LC_ALL`/`LC_MESSAGES`/`LANG`) fún CLI àti ojú-ìṣiṣẹ́ GTK4 méjèèjì. Wo [README.md](../../../README.md) fún tábìlì èdè tí ó pé.
 
 ## Àwọn Ohun Àkọ́kọ́ Tí A Nílò
 
-- **Rust**: Ẹ̀yà 1.85 tàbí jù bẹ́ẹ̀ lọ (MSRV)
+- **Rust**: Ẹ̀yà 1.94 tàbí jù bẹ́ẹ̀ lọ (MSRV)
 - **Cargo**: Ó wà nínú ìfisílé Rust
 
 ## Ìfisílé
@@ -74,7 +74,7 @@ cd awb-rs
 cargo build --workspace --release
 
 # Fi fáìlì ìṣiṣẹ́ sí orí ẹ̀rọ
-cargo install --path awb-cli
+cargo install --path crates/awb_cli
 ```
 
 ## Ìdàgbàsókè Ètò
@@ -239,7 +239,7 @@ end
 ### Àwọn Àfikún WebAssembly
 
 ```rust
-// Kọ ọ́ sí WASM pẹ̀lú: cargo build --target wasm32-wasi
+// Kọ ọ́ sí WASM pẹ̀lú: cargo build --target wasm32-wasip1
 #[no_mangle]
 pub extern "C" fn transform(content: &str) -> String {
     content.replace("foo", "bar")

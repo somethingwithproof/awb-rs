@@ -54,11 +54,11 @@ CLI → Cibiya → API → MediaWiki
 
 ## Harsunan da Ake Tallafawa
 
-Layin umarni (CLI), rahotannin bot, da fuskar GTK4 suna tallafawa harsuna 45 (ciki har da harsunan RTL guda 6: `ar`, `ar-EG`, `ar-MA`, `fa`, `he`, da `ur`). Yi amfani da `--lang <LANG>` ko saita `AWB_LANG` don sauya zaɓin harshen na'ura. Duba [README.md](../../../README.md) don cikakken teburin harsuna.
+Layin umarni (CLI), rahotannin bot, da fuskar GTK4 suna tallafawa harsuna 45 (ciki har da harsunan RTL guda 6: `ar`, `ar-EG`, `ar-MA`, `fa`, `he`, da `ur`). Yi amfani da `--lang <LANG>` a cikin CLI, ko saita `AWB_LANG` ko masu canjin yanki na POSIX (`LC_ALL`/`LC_MESSAGES`/`LANG`) don CLI da fuskar GTK4 duka biyu. Duba [README.md](../../../README.md) don cikakken teburin harsuna.
 
 ## Abubuwan da Ake Buƙata
 
-- **Rust**: Sigar 1.85 ko sama da haka (MSRV)
+- **Rust**: Sigar 1.94 ko sama da haka (MSRV)
 - **Cargo**: Yana zuwa tare da shigar da Rust
 
 ## Shigarwa
@@ -74,7 +74,7 @@ cd awb-rs
 cargo build --workspace --release
 
 # Shigar da fayil ɗin gudanarwa
-cargo install --path awb-cli
+cargo install --path crates/awb_cli
 ```
 
 ## Haɓakawa
@@ -239,7 +239,7 @@ end
 ### Ƙarin Manhajojin WebAssembly
 
 ```rust
-// Haɗa zuwa WASM tare da: cargo build --target wasm32-wasi
+// Haɗa zuwa WASM tare da: cargo build --target wasm32-wasip1
 #[no_mangle]
 pub extern "C" fn transform(content: &str) -> String {
     content.replace("foo", "bar")

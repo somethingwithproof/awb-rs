@@ -54,11 +54,11 @@ CLI → ప్రధాన పొర → API → MediaWiki
 
 ## మద్దతు ఉన్న భాషలు
 
-CLI, బాట్ నివేదికలు మరియు GTK4 UI 45 భాషలకు మద్దతు ఇస్తాయి (ఇందులో 6 RTL లోకేల్స్ ఉన్నాయి: `ar`, `ar-EG`, `ar-MA`, `fa`, `he`, మరియు `ur`). సిస్టమ్ లోకేల్ గుర్తింపును అధిగమించడానికి `--lang <LANG>` ఇవ్వండి లేదా `AWB_LANG` సెట్ చేయండి. పూర్తి భాషల పట్టిక కోసం [README.md](../../../README.md) చూడండి.
+CLI, బాట్ నివేదికలు మరియు GTK4 UI 45 భాషలకు మద్దతు ఇస్తాయి (ఇందులో 6 RTL లోకేల్స్ ఉన్నాయి: `ar`, `ar-EG`, `ar-MA`, `fa`, `he`, మరియు `ur`). CLI లో `--lang <LANG>` ఉపయోగించండి, లేదా CLI మరియు GTK4 UI రెండింటికీ `AWB_LANG` లేదా POSIX లోకేల్ వేరియబుల్స్ (`LC_ALL`/`LC_MESSAGES`/`LANG`) సెట్ చేయండి. పూర్తి భాషల పట్టిక కోసం [README.md](../../../README.md) చూడండి.
 
 ## ముందస్తు అవసరాలు
 
-- **Rust**: వెర్షన్ 1.85 లేదా ఆపై వెర్షన్ (MSRV)
+- **Rust**: వెర్షన్ 1.94 లేదా ఆపై వెర్షన్ (MSRV)
 - **Cargo**: Rust స్థాపనతో పాటు అందుబాటులో ఉంటుంది
 
 ## స్థాపన
@@ -74,7 +74,7 @@ cd awb-rs
 cargo build --workspace --release
 
 # బైనరీని స్థాపించండి
-cargo install --path awb-cli
+cargo install --path crates/awb_cli
 ```
 
 ## అభివృద్ధి
@@ -239,7 +239,7 @@ end
 ### WebAssembly ప్లగిన్లు
 
 ```rust
-// WASM కు కంపైల్ చేయడానికి: cargo build --target wasm32-wasi
+// WASM కు కంపైల్ చేయడానికి: cargo build --target wasm32-wasip1
 #[no_mangle]
 pub extern "C" fn transform(content: &str) -> String {
     content.replace("foo", "bar")

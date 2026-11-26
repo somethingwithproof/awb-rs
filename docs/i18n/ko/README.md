@@ -54,11 +54,11 @@ CLI → 코어 → API → MediaWiki
 
 ## 지원 언어
 
-CLI, 봇 보고서 및 GTK4 UI는 45개 언어(6개 RTL 로캘 `ar`, `ar-EG`, `ar-MA`, `fa`, `he`, `ur` 포함)를 지원합니다. 시스템 로캘 자동 감지를 재정의하려면 `--lang <LANG>` 옵션을 전달하거나 `AWB_LANG` 환경 변수를 설정하십시오. 전체 언어 목록은 [README.md](../../../README.md)를 참조하십시오.
+CLI, 봇 보고서 및 GTK4 UI는 45개 언어(6개 RTL 로캘 `ar`, `ar-EG`, `ar-MA`, `fa`, `he`, `ur` 포함)를 지원합니다. CLI에서는 `--lang <LANG>` 옵션을 사용하고, CLI와 GTK4 UI 모두에서는 `AWB_LANG` 또는 POSIX 로캘 환경 변수(`LC_ALL`/`LC_MESSAGES`/`LANG`)를 설정하십시오. 전체 언어 목록은 [README.md](../../../README.md)를 참조하십시오.
 
 ## 사전 요구 사항
 
-- **Rust**: 1.85 이상 (MSRV)
+- **Rust**: 1.94 이상 (MSRV)
 - **Cargo**: Rust 설치 시 함께 포함됨
 
 ## 설치
@@ -74,7 +74,7 @@ cd awb-rs
 cargo build --workspace --release
 
 # 바이너리 설치
-cargo install --path awb-cli
+cargo install --path crates/awb_cli
 ```
 
 ## 개발
@@ -239,7 +239,7 @@ end
 ### WebAssembly 플러그인
 
 ```rust
-// WASM으로 컴파일: cargo build --target wasm32-wasi
+// WASM으로 컴파일: cargo build --target wasm32-wasip1
 #[no_mangle]
 pub extern "C" fn transform(content: &str) -> String {
     content.replace("foo", "bar")

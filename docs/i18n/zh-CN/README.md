@@ -54,11 +54,11 @@ CLI → 核心层 → API → MediaWiki
 
 ## 支持的语言
 
-CLI、机器人报告以及 GTK4 界面共支持 45 种语言（包含 6 个 RTL 区域设置：`ar`、`ar-EG`、`ar-MA`、`fa`、`he` 和 `ur`）。可通过传入 `--lang <LANG>` 或设置 `AWB_LANG` 覆盖系统语言检测。完整语言列表请参阅 [README.md](../../../README.md)。
+CLI、机器人报告以及 GTK4 界面共支持 45 种语言（包含 6 个 RTL 区域设置：`ar`、`ar-EG`、`ar-MA`、`fa`、`he` 和 `ur`）。在 CLI 中可传入 `--lang <LANG>`，也可设置 `AWB_LANG` 或 POSIX 区域设置变量（`LC_ALL`/`LC_MESSAGES`/`LANG`），同时适用于 CLI 和 GTK4 界面。完整语言列表请参阅 [README.md](../../../README.md)。
 
 ## 环境要求
 
-- **Rust**：1.85 或更高版本（MSRV）
+- **Rust**：1.94 或更高版本（MSRV）
 - **Cargo**：随 Rust 安装自动附带
 
 ## 安装
@@ -74,7 +74,7 @@ cd awb-rs
 cargo build --workspace --release
 
 # 安装二进制程序
-cargo install --path awb-cli
+cargo install --path crates/awb_cli
 ```
 
 ## 开发
@@ -239,7 +239,7 @@ end
 ### WebAssembly 插件
 
 ```rust
-// 使用以下命令编译为 WASM：cargo build --target wasm32-wasi
+// 使用以下命令编译为 WASM：cargo build --target wasm32-wasip1
 #[no_mangle]
 pub extern "C" fn transform(content: &str) -> String {
     content.replace("foo", "bar")

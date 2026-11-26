@@ -2,7 +2,7 @@
 // SPDX-License-Identifier: MIT
 
 use anyhow::Result;
-use awb_domain::i18n::{Locale, extract_cli_lang};
+use awb_domain::i18n::{Locale, extract_cli_lang_os};
 use clap::{CommandFactory, FromArgMatches, Parser, Subcommand};
 use std::path::PathBuf;
 use url::Url;
@@ -216,8 +216,8 @@ async fn main() -> Result<()> {
         human_output: true,
     })?;
 
-    let raw_args: Vec<String> = std::env::args().collect();
-    let initial_locale = Locale::resolve(extract_cli_lang(&raw_args).as_deref());
+    let raw_args: Vec<std::ffi::OsString> = std::env::args_os().collect();
+    let initial_locale = Locale::resolve(extract_cli_lang_os(&raw_args).as_deref());
     let matches = localized_command(initial_locale).get_matches_from(raw_args);
     let cli = Cli::from_arg_matches(&matches)?;
     let locale = Locale::resolve(cli.lang.as_deref());
@@ -282,5 +282,94 @@ async fn main() -> Result<()> {
                 profile,
             } => commands::oauth::authorize(wiki, client_id, profile, locale).await,
         },
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn test_localized_command_subcommands_across_locales() {
+        for locale in [Locale::En, Locale::De, Locale::Ja, Locale::ArEg] {
+            let cat = locale.catalog();
+            let cmd = localized_command(locale);
+
+            assert_eq!(
+                cmd.get_about().map(|s| s.to_string()),
+                Some(cat.cli_about.to_string())
+            );
+
+            let lang_arg = cmd
+                .get_arguments()
+                .find(|a| a.get_id() == "lang")
+                .expect("lang argument present");
+            assert_eq!(
+                lang_arg.get_help().map(|s| s.to_string()),
+                Some(cat.cli_opt_lang.to_string())
+            );
+
+            for (name, expected_about) in [
+                ("login", cat.cli_cmd_login),
+                ("list", cat.cli_cmd_list),
+                ("run", cat.cli_cmd_run),
+                ("export-log", cat.cli_cmd_export_log),
+                ("bot", cat.cli_cmd_bot),
+                ("o-auth", cat.cli_cmd_oauth),
+            ] {
+                let sub = cmd
+                    .find_subcommand(name)
+                    .unwrap_or_else(|| panic!("subcommand {name} missing"));
+                assert_eq!(
+                    sub.get_about().map(|s| s.to_string()),
+                    Some(expected_about.to_string()),
+                    "about mismatch for subcommand {name} in {}",
+                    locale.code()
+                );
+            }
+
+            let oauth = cmd
+                .find_subcommand("o-auth")
+                .expect("o-auth subcommand present");
+            assert_eq!(
+                oauth
+                    .find_subcommand("setup")
+                    .and_then(|s| s.get_about())
+                    .map(|s| s.to_string()),
+                Some(cat.cli_cmd_oauth_setup.to_string())
+            );
+            assert_eq!(
+                oauth
+                    .find_subcommand("authorize")
+                    .and_then(|s| s.get_about())
+                    .map(|s| s.to_string()),
+                Some(cat.cli_cmd_oauth_authorize.to_string())
+            );
+        }
+    }
+
+    #[test]
+    fn test_localized_command_parses_cli_args() {
+        let matches = localized_command(Locale::De)
+            .try_get_matches_from([
+                "awb-rs",
+                "--lang",
+                "de",
+                "export-log",
+                "--format",
+                "json",
+                "--output",
+                "out.json",
+            ])
+            .expect("valid cli arguments");
+        let cli = Cli::from_arg_matches(&matches).expect("valid Cli match");
+        assert_eq!(cli.lang.as_deref(), Some("de"));
+        match cli.command {
+            Commands::ExportLog { format, output } => {
+                assert!(matches!(format, ExportFormat::Json));
+                assert_eq!(output, PathBuf::from("out.json"));
+            }
+            _ => panic!("expected ExportLog command"),
+        }
     }
 }

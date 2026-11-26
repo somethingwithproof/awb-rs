@@ -26,9 +26,11 @@ pub struct MainWindow {
 impl MainWindow {
     pub fn new(app: &adw::Application) -> Self {
         let locale = Locale::resolve(None);
-        if locale.is_rtl() {
-            gtk::Widget::set_default_direction(gtk::TextDirection::Rtl);
-        }
+        gtk::Widget::set_default_direction(if locale.is_rtl() {
+            gtk::TextDirection::Rtl
+        } else {
+            gtk::TextDirection::Ltr
+        });
         let cat = locale.catalog();
 
         // Create the main window

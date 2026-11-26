@@ -54,13 +54,13 @@ CLI → Core → API → MediaWiki
 
 ## Поддерживаемые языки
 
-CLI, отчёты ботов и графический интерфейс GTK4 поддерживают 45 языков (включая 6 локалей RTL: `ar`, `ar-EG`, `ar-MA`, `fa`, `he` и `ur`). Передайте флаг `--lang <LANG>` или задайте переменную `AWB_LANG`, чтобы переопределить автоматическое определение системной локали.
+CLI, отчёты ботов и графический интерфейс GTK4 поддерживают 45 языков (включая 6 локалей RTL: `ar`, `ar-EG`, `ar-MA`, `fa`, `he` и `ur`). Используйте флаг `--lang <LANG>` в CLI либо задайте `AWB_LANG` или переменные локали POSIX (`LC_ALL`/`LC_MESSAGES`/`LANG`) как для CLI, так и для интерфейса GTK4.
 
 Полную таблицу всех 45 поддерживаемых языков и ссылки на локализованную документацию см. в [README.md](../../../README.md).
 
 ## Предварительные требования
 
-- **Rust**: Версия 1.85 или выше (MSRV)
+- **Rust**: Версия 1.94 или выше (MSRV)
 - **Cargo**: Входит в стандартную установку Rust
 
 ## Установка
@@ -76,7 +76,7 @@ cd awb-rs
 cargo build --workspace --release
 
 # Установить исполняемый файл
-cargo install --path awb-cli
+cargo install --path crates/awb_cli
 ```
 
 ## Разработка
@@ -241,7 +241,7 @@ end
 ### Плагины WebAssembly
 
 ```rust
-// Скомпилируйте в WASM командой: cargo build --target wasm32-wasi
+// Скомпилируйте в WASM командой: cargo build --target wasm32-wasip1
 #[no_mangle]
 pub extern "C" fn transform(content: &str) -> String {
     content.replace("foo", "bar")

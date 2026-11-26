@@ -54,11 +54,11 @@ CLI → Isi Usoro → API → MediaWiki
 
 ## Asụsụ A Na-akwado
 
-Ahịrị iwu (CLI), mkpesa bot, na ihu GTK4 na-akwado asụsụ 45 (gụnyere asụsụ RTL 6: `ar`, `ar-EG`, `ar-MA`, `fa`, `he`, na `ur`). Tinye `--lang <LANG>` ma ọ bụ tọọ `AWB_LANG` iji dochie nchọpụta asụsụ sistemụ. Lelee [README.md](../../../README.md) maka tebụl asụsụ zuru ezu.
+Ahịrị iwu (CLI), mkpesa bot, na ihu GTK4 na-akwado asụsụ 45 (gụnyere asụsụ RTL 6: `ar`, `ar-EG`, `ar-MA`, `fa`, `he`, na `ur`). Jiri `--lang <LANG>` n'ime CLI, ma ọ bụ tọọ `AWB_LANG` ma ọ bụ mgbanwe mpaghara POSIX (`LC_ALL`/`LC_MESSAGES`/`LANG`) maka ma CLI ma ihu GTK4. Lelee [README.md](../../../README.md) maka tebụl asụsụ zuru ezu.
 
 ## Ihe Achọrọ Tupu Mgbe
 
-- **Rust**: Ụdị 1.85 ma ọ bụ karịa (MSRV)
+- **Rust**: Ụdị 1.94 ma ọ bụ karịa (MSRV)
 - **Cargo**: A gụnyere ya na nrụnye Rust
 
 ## Nrụnye
@@ -74,7 +74,7 @@ cd awb-rs
 cargo build --workspace --release
 
 # Wụnye ngwa a na-agba ọsọ
-cargo install --path awb-cli
+cargo install --path crates/awb_cli
 ```
 
 ## Mmepe
@@ -239,7 +239,7 @@ end
 ### Mgbakwunye WebAssembly
 
 ```rust
-// Chịkọta gaa WASM site na: cargo build --target wasm32-wasi
+// Chịkọta gaa WASM site na: cargo build --target wasm32-wasip1
 #[no_mangle]
 pub extern "C" fn transform(content: &str) -> String {
     content.replace("foo", "bar")

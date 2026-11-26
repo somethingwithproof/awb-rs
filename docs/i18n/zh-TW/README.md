@@ -54,11 +54,11 @@ CLI → 核心層 → API → MediaWiki
 
 ## 支援語言
 
-CLI、機器人報告與 GTK4 介面共支援 45 種語言（包含 6 個 RTL 地區設定：`ar`、`ar-EG`、`ar-MA`、`fa`、`he` 與 `ur`）。傳入 `--lang <LANG>` 或設定 `AWB_LANG` 環境變數即可覆寫系統語言偵測。完整語言列表請參閱 [README.md](../../../README.md)。
+CLI、機器人報告與 GTK4 介面共支援 45 種語言（包含 6 個 RTL 地區設定：`ar`、`ar-EG`、`ar-MA`、`fa`、`he` 與 `ur`）。在 CLI 中可傳入 `--lang <LANG>`，亦可設定 `AWB_LANG` 或 POSIX 地區設定變數（`LC_ALL`/`LC_MESSAGES`/`LANG`），同時適用於 CLI 與 GTK4 介面。完整語言列表請參閱 [README.md](../../../README.md)。
 
 ## 系統需求
 
-- **Rust**：1.85 或以上版本（MSRV）
+- **Rust**：1.94 或以上版本（MSRV）
 - **Cargo**：隨 Rust 安裝一併提供
 
 ## 安裝
@@ -74,7 +74,7 @@ cd awb-rs
 cargo build --workspace --release
 
 # 安裝執行檔
-cargo install --path awb-cli
+cargo install --path crates/awb_cli
 ```
 
 ## 開發
@@ -239,7 +239,7 @@ end
 ### WebAssembly 外掛
 
 ```rust
-// 編譯為 WASM：cargo build --target wasm32-wasi
+// 編譯為 WASM：cargo build --target wasm32-wasip1
 #[no_mangle]
 pub extern "C" fn transform(content: &str) -> String {
     content.replace("foo", "bar")

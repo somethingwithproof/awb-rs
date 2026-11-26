@@ -54,11 +54,11 @@ CLI → Pangunahing Layer → API → MediaWiki
 
 ## Mga Sinusuportahang Wika
 
-Sinusuportahan ng CLI, mga ulat ng bot, at GTK4 UI ang 45 wika (kabilang ang 6 na RTL locale: `ar`, `ar-EG`, `ar-MA`, `fa`, `he`, at `ur`). Ipasa ang `--lang <LANG>` o itakda ang `AWB_LANG` upang palitan ang awtomatikong pagtukoy ng wika ng sistema. Tingnan ang [README.md](../../../README.md) para sa kumpletong talahanayan ng mga wika.
+Sinusuportahan ng CLI, mga ulat ng bot, at GTK4 UI ang 45 wika (kabilang ang 6 na RTL locale: `ar`, `ar-EG`, `ar-MA`, `fa`, `he`, at `ur`). Gamitin ang `--lang <LANG>` sa CLI, o itakda ang `AWB_LANG` o mga POSIX locale variable (`LC_ALL`/`LC_MESSAGES`/`LANG`) para sa parehong CLI at GTK4 UI. Tingnan ang [README.md](../../../README.md) para sa kumpletong talahanayan ng mga wika.
 
 ## Mga Kinakailangan
 
-- **Rust**: Bersyon 1.85 o mas bago (MSRV)
+- **Rust**: Bersyon 1.94 o mas bago (MSRV)
 - **Cargo**: Kasama sa pag-install ng Rust
 
 ## Pag-install
@@ -74,7 +74,7 @@ cd awb-rs
 cargo build --workspace --release
 
 # I-install ang binary
-cargo install --path awb-cli
+cargo install --path crates/awb_cli
 ```
 
 ## Pag-develop
@@ -239,7 +239,7 @@ end
 ### Mga WebAssembly Plugin
 
 ```rust
-// I-compile sa WASM gamit ang: cargo build --target wasm32-wasi
+// I-compile sa WASM gamit ang: cargo build --target wasm32-wasip1
 #[no_mangle]
 pub extern "C" fn transform(content: &str) -> String {
     content.replace("foo", "bar")

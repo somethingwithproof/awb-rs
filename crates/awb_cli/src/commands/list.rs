@@ -18,13 +18,13 @@ pub async fn run(
     locale: Locale,
 ) -> Result<()> {
     let cat = locale.catalog();
-    println!("{}", style(cat.list_title).bold().cyan());
-    println!("{}: {}", cat.label_wiki, wiki);
-    println!("{}: {:?}", cat.label_source, source);
+    super::emit_stdout_line(&format!("{}", style(cat.list_title).bold().cyan()));
+    super::emit_stdout_line(&format!("{}: {}", cat.label_wiki, wiki));
+    super::emit_stdout_line(&format!("{}: {:?}", cat.label_source, source));
     if !matches!(source, ListSource::Watchlist) {
-        println!("{}: {}", cat.label_query, query);
+        super::emit_stdout_line(&format!("{}: {}", cat.label_query, query));
     }
-    println!();
+    super::emit_stdout_line("");
 
     let titles = match source {
         ListSource::Category => fetch_category_members(&wiki, &query, limit, cat).await?,
@@ -225,4 +225,104 @@ async fn fetch_user_contribs(
         .context(cat.err_fetch_contribs)?;
 
     Ok(titles)
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use crate::commands::test_support::TestTempDir;
+
+    #[tokio::test]
+    async fn test_list_run_from_file_valid_and_limited() {
+        let tmp = TestTempDir::new("list");
+        let wiki = Url::parse("https://en.wikipedia.org/w/api.php").unwrap();
+
+        let list_file = tmp.path().join("pages.txt");
+        std::fs::write(&list_file, "Alpha\n\n  Beta  \nGamma\nDelta\n").expect("write pages file");
+
+        run(
+            wiki.clone(),
+            ListSource::File,
+            list_file.display().to_string(),
+            10,
+            Locale::En,
+        )
+        .await
+        .expect("list from file succeeds");
+
+        // Trigger the `titles.len() > limit && limit > 0` truncation message branch
+        run(
+            wiki,
+            ListSource::File,
+            list_file.display().to_string(),
+            2,
+            Locale::De,
+        )
+        .await
+        .expect("list from file with limit succeeds");
+
+        let titles = fetch_from_file(&list_file.display().to_string(), Locale::En.catalog())
+            .await
+            .expect("fetch_from_file returns parsed titles");
+        assert_eq!(titles.len(), 4);
+        assert_eq!(titles[0].display, "Alpha");
+        assert_eq!(titles[1].display, "Beta");
+    }
+
+    #[tokio::test]
+    async fn test_list_run_from_file_errors() {
+        let tmp = TestTempDir::new("list-err");
+        let wiki = Url::parse("https://en.wikipedia.org/w/api.php").unwrap();
+
+        // Nonexistent file
+        let missing = tmp.path().join("does-not-exist.txt");
+        let err = run(
+            wiki.clone(),
+            ListSource::File,
+            missing.display().to_string(),
+            10,
+            Locale::Fr,
+        )
+        .await
+        .unwrap_err();
+        assert!(
+            err.to_string()
+                .contains(Locale::Fr.catalog().err_access_file)
+        );
+
+        // Directory instead of regular file
+        let err = run(
+            wiki.clone(),
+            ListSource::File,
+            tmp.path().display().to_string(),
+            10,
+            Locale::Es,
+        )
+        .await
+        .unwrap_err();
+        assert!(
+            err.to_string()
+                .contains(Locale::Es.catalog().err_not_regular_file)
+        );
+
+        // Oversized (>10MB) sparse file
+        let huge = tmp.path().join("huge.txt");
+        let file = std::fs::File::create(&huge).expect("create huge file");
+        file.set_len(10 * 1024 * 1024 + 1)
+            .expect("set sparse file length");
+        drop(file);
+        let err = run(
+            wiki,
+            ListSource::File,
+            huge.display().to_string(),
+            10,
+            Locale::Ja,
+        )
+        .await
+        .unwrap_err();
+        assert!(
+            err.to_string()
+                .contains(Locale::Ja.catalog().err_file_too_large)
+        );
+    }
 }

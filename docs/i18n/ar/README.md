@@ -54,11 +54,11 @@ CLI → النواة → API → MediaWiki
 
 ## اللغات المدعومة
 
-تدعم واجهة سطر الأوامر وتقارير البوت وواجهة GTK4 الرسومية 45 لغة (بما في ذلك 6 لغات من اليمين إلى اليسار: `ar` و`ar-EG` و`ar-MA` و`fa` و`he` و`ur`). مرّر الخيار `--lang <LANG>` أو اضبط المتغير `AWB_LANG` لتجاوز اكتشاف لغة النظام. للاطلاع على الجدول الكامل للغات، يُرجى الرجوع إلى [README.md](../../../README.md).
+تدعم واجهة سطر الأوامر وتقارير البوت وواجهة GTK4 الرسومية 45 لغة (بما في ذلك 6 لغات من اليمين إلى اليسار: `ar` و`ar-EG` و`ar-MA` و`fa` و`he` و`ur`). مرّر الخيار `--lang <LANG>` في واجهة سطر الأوامر، أو اضبط `AWB_LANG` أو متغيرات اللغة POSIX (`LC_ALL`/`LC_MESSAGES`/`LANG`) لكلٍّ من واجهة سطر الأوامر وواجهة GTK4 الرسومية. للاطلاع على الجدول الكامل للغات، يُرجى الرجوع إلى [README.md](../../../README.md).
 
 ## المتطلبات الأساسية
 
-- **Rust**: الإصدار 1.85 أو أحدث (الحد الأدنى المدعوم لإصدار Rust)
+- **Rust**: الإصدار 1.94 أو أحدث (الحد الأدنى المدعوم لإصدار Rust)
 - **Cargo**: مُضمّن تلقائيًا مع تثبيت Rust
 
 ## التثبيت
@@ -74,7 +74,7 @@ cd awb-rs
 cargo build --workspace --release
 
 # تثبيت الملف التنفيذي
-cargo install --path awb-cli
+cargo install --path crates/awb_cli
 ```
 
 ## التطوير
@@ -239,7 +239,7 @@ end
 ### إضافات WebAssembly
 
 ```rust
-// التحويل البرمجي إلى WASM عبر: cargo build --target wasm32-wasi
+// التحويل البرمجي إلى WASM عبر: cargo build --target wasm32-wasip1
 #[no_mangle]
 pub extern "C" fn transform(content: &str) -> String {
     content.replace("foo", "bar")

@@ -54,11 +54,11 @@ CLI → Undoqo → API → MediaWiki
 
 ## Iilwimi eziXhaswayo
 
-I-CLI, iingxelo zeebot, kunye nojongano lwe-GTK4 zixhasa iilwimi ezingama-45 (kuquka iilwimi ezi-6 ze-RTL: `ar`, `ar-EG`, `ar-MA`, `fa`, `he`, kunye ne-`ur`). Sebenzisa `--lang <LANG>` okanye usete i-`AWB_LANG` ukutshintsha ukubonwa kolwimi lwenkqubo. Jonga ku-[README.md](../../../README.md) ngoluhlu olupheleleyo lweelwimi.
+I-CLI, iingxelo zeebot, kunye nojongano lwe-GTK4 zixhasa iilwimi ezingama-45 (kuquka iilwimi ezi-6 ze-RTL: `ar`, `ar-EG`, `ar-MA`, `fa`, `he`, kunye ne-`ur`). Sebenzisa `--lang <LANG>` kwi-CLI, okanye usete i-`AWB_LANG` okanye iziguquguquki zolwimi ze-POSIX (`LC_ALL`/`LC_MESSAGES`/`LANG`) kuyo yomibini i-CLI kunye nojongano lwe-GTK4. Jonga ku-[README.md](../../../README.md) ngoluhlu olupheleleyo lweelwimi.
 
 ## Iimfuno zokuQala
 
-- **Rust**: Inguqulelo 1.85 okanye ngaphezulu (MSRV)
+- **Rust**: Inguqulelo 1.94 okanye ngaphezulu (MSRV)
 - **Cargo**: Iqukiwe kufakelo lwe-Rust
 
 ## Ufakelo
@@ -74,7 +74,7 @@ cd awb-rs
 cargo build --workspace --release
 
 # Faka inkqubo eqhutywayo
-cargo install --path awb-cli
+cargo install --path crates/awb_cli
 ```
 
 ## Uphuhliso
@@ -239,7 +239,7 @@ end
 ### Iiplagini ze-WebAssembly
 
 ```rust
-// Hlanganisa uye kwi-WASM nge: cargo build --target wasm32-wasi
+// Hlanganisa uye kwi-WASM nge: cargo build --target wasm32-wasip1
 #[no_mangle]
 pub extern "C" fn transform(content: &str) -> String {
     content.replace("foo", "bar")

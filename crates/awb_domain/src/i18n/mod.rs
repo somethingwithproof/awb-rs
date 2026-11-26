@@ -195,35 +195,50 @@ impl Locale {
 
         let mut parts = normalized.split('-');
         let primary = parts.next().unwrap_or("");
-        let rest: Vec<&str> = parts.collect();
-        let has_subtag = |target: &str| rest.contains(&target);
+        let mut script: Option<&str> = None;
+        let mut region: Option<&str> = None;
+
+        for subtag in parts {
+            if subtag.is_empty() {
+                continue;
+            }
+            // Stop at singleton-led extension or private-use sections (e.g. -x-, -u-, -t-).
+            if subtag.len() == 1 {
+                break;
+            }
+            if script.is_none()
+                && region.is_none()
+                && subtag.len() == 4
+                && subtag.bytes().all(|b| b.is_ascii_alphabetic())
+            {
+                script = Some(subtag);
+            } else if region.is_none()
+                && ((subtag.len() == 2 && subtag.bytes().all(|b| b.is_ascii_alphabetic()))
+                    || (subtag.len() == 3 && subtag.bytes().all(|b| b.is_ascii_digit())))
+            {
+                region = Some(subtag);
+            }
+        }
 
         match primary {
-            "ar" => {
-                if has_subtag("eg") {
-                    Some(Locale::ArEg)
-                } else if has_subtag("ma") {
-                    Some(Locale::ArMa)
-                } else {
-                    Some(Locale::Ar)
-                }
-            }
-            "fr" => {
-                if has_subtag("ma") {
-                    Some(Locale::FrMa)
-                } else if has_subtag("sn") {
-                    Some(Locale::FrSn)
-                } else {
-                    Some(Locale::Fr)
-                }
-            }
-            "zh" => {
-                if has_subtag("hant") || has_subtag("tw") || has_subtag("hk") || has_subtag("mo") {
-                    Some(Locale::ZhTw)
-                } else {
-                    Some(Locale::ZhCn)
-                }
-            }
+            "ar" => match region {
+                Some("eg") => Some(Locale::ArEg),
+                Some("ma") => Some(Locale::ArMa),
+                _ => Some(Locale::Ar),
+            },
+            "fr" => match region {
+                Some("ma") => Some(Locale::FrMa),
+                Some("sn") => Some(Locale::FrSn),
+                _ => Some(Locale::Fr),
+            },
+            "zh" => match script {
+                Some("hans") => Some(Locale::ZhCn),
+                Some("hant") => Some(Locale::ZhTw),
+                _ => match region {
+                    Some("tw" | "hk" | "mo") => Some(Locale::ZhTw),
+                    _ => Some(Locale::ZhCn),
+                },
+            },
             "en" => Some(Locale::En),
             "de" => Some(Locale::De),
             "es" => Some(Locale::Es),
@@ -317,16 +332,70 @@ pub fn extract_cli_lang(args: &[String]) -> Option<String> {
     None
 }
 
+/// Extract `--lang <value>` or `--lang=<value>` from OS-native CLI arguments
+/// without losing or panicking on non-UTF-8 arguments (such as file paths).
+pub fn extract_cli_lang_os(args: &[std::ffi::OsString]) -> Option<String> {
+    let mut iter = args.iter().skip(1);
+    while let Some(arg) = iter.next() {
+        let Some(arg_str) = arg.to_str() else {
+            continue;
+        };
+        if arg_str == "--" {
+            break;
+        }
+        if arg_str == "--lang" {
+            return iter.next().and_then(|v| v.to_str()).map(str::to_string);
+        }
+        if let Some(val) = arg_str.strip_prefix("--lang=") {
+            return Some(val.to_string());
+        }
+    }
+    None
+}
+
 /// Replace a single `{key}` placeholder in a catalog template.
 pub fn fmt1(template: &str, key: &str, value: &str) -> String {
     template.replace(&format!("{{{key}}}"), value)
 }
 
-/// Replace two `{key}` placeholders in a catalog template.
+/// Replace two `{key}` placeholders in a catalog template in a single pass
+/// so inserted values are never re-scanned for the other placeholder.
 pub fn fmt2(template: &str, key1: &str, val1: &str, key2: &str, val2: &str) -> String {
-    template
-        .replace(&format!("{{{key1}}}"), val1)
-        .replace(&format!("{{{key2}}}"), val2)
+    let token1 = format!("{{{key1}}}");
+    let token2 = format!("{{{key2}}}");
+    let mut out = String::with_capacity(template.len() + val1.len() + val2.len());
+    let mut rest = template;
+    while !rest.is_empty() {
+        let next1 = rest.find(&token1);
+        let next2 = rest.find(&token2);
+        match (next1, next2) {
+            (Some(i1), Some(i2)) if i1 <= i2 => {
+                out.push_str(&rest[..i1]);
+                out.push_str(val1);
+                rest = &rest[i1 + token1.len()..];
+            }
+            (Some(_), Some(i2)) => {
+                out.push_str(&rest[..i2]);
+                out.push_str(val2);
+                rest = &rest[i2 + token2.len()..];
+            }
+            (Some(i1), None) => {
+                out.push_str(&rest[..i1]);
+                out.push_str(val1);
+                rest = &rest[i1 + token1.len()..];
+            }
+            (None, Some(i2)) => {
+                out.push_str(&rest[..i2]);
+                out.push_str(val2);
+                rest = &rest[i2 + token2.len()..];
+            }
+            (None, None) => {
+                out.push_str(rest);
+                break;
+            }
+        }
+    }
+    out
 }
 
 #[cfg(test)]
@@ -454,6 +523,62 @@ mod tests {
     }
 
     #[test]
+    fn test_bcp47_extensions_and_chinese_script_precedence() {
+        // Explicit Chinese script takes precedence over region fallback
+        assert_eq!(Locale::from_tag("zh-Hans-HK"), Some(Locale::ZhCn));
+        assert_eq!(Locale::from_tag("zh-Hant-CN"), Some(Locale::ZhTw));
+        assert_eq!(Locale::from_tag("zh-HK"), Some(Locale::ZhTw));
+        assert_eq!(Locale::from_tag("zh-MO"), Some(Locale::ZhTw));
+        assert_eq!(Locale::from_tag("zh-TW"), Some(Locale::ZhTw));
+        assert_eq!(Locale::from_tag("zh-CN"), Some(Locale::ZhCn));
+        assert_eq!(Locale::from_tag("zh"), Some(Locale::ZhCn));
+        assert_eq!(Locale::from_tag("zh-Latn-TW"), Some(Locale::ZhTw));
+
+        // Singleton-led extension and private-use subtags are ignored
+        assert_eq!(Locale::from_tag("fr-SN-x-ma"), Some(Locale::FrSn));
+        assert_eq!(Locale::from_tag("fr-MA-x-sn"), Some(Locale::FrMa));
+        assert_eq!(Locale::from_tag("fr-x-ma"), Some(Locale::Fr));
+        assert_eq!(Locale::from_tag("zh-CN-x-tw"), Some(Locale::ZhCn));
+        assert_eq!(Locale::from_tag("zh-x-tw"), Some(Locale::ZhCn));
+        assert_eq!(Locale::from_tag("ar-EG-u-nu-latn"), Some(Locale::ArEg));
+        assert_eq!(Locale::from_tag("ar-MA-t-eg"), Some(Locale::ArMa));
+        assert_eq!(Locale::from_tag("ar-u-eg"), Some(Locale::Ar));
+
+        // 3-digit UN M.49 regions and empty subtags
+        assert_eq!(Locale::from_tag("ar-001"), Some(Locale::Ar));
+        assert_eq!(Locale::from_tag("es-419"), Some(Locale::Es));
+        assert_eq!(Locale::from_tag("fr--MA"), Some(Locale::FrMa));
+        assert_eq!(Locale::from_tag("   "), None);
+    }
+
+    #[test]
+    fn test_fmt1_and_fmt2() {
+        assert_eq!(fmt1("Hello {name}!", "name", "AWB"), "Hello AWB!");
+        assert_eq!(
+            fmt2(
+                "Saved {page} (rev {rev})",
+                "page",
+                "Main Page",
+                "rev",
+                "12345"
+            ),
+            "Saved Main Page (rev 12345)"
+        );
+        // Single-pass substitution must not re-scan inserted values
+        assert_eq!(
+            fmt2("Saved: {page} (rev {rev})", "page", "{rev}", "rev", "42"),
+            "Saved: {rev} (rev 42)"
+        );
+        // Reverse order and mutual placeholder swap
+        assert_eq!(
+            fmt2("Rev {rev}: {page}", "page", "{rev}", "rev", "{page}"),
+            "Rev {page}: {rev}"
+        );
+        // Template without matching placeholders stays unchanged
+        assert_eq!(fmt2("Plain text", "a", "1", "b", "2"), "Plain text");
+    }
+
+    #[test]
     fn test_extract_cli_lang() {
         let args = vec![
             "awb-rs".to_string(),
@@ -465,5 +590,164 @@ mod tests {
 
         let args_eq = vec!["awb-rs".to_string(), "--lang=zh-CN".to_string()];
         assert_eq!(extract_cli_lang(&args_eq), Some("zh-CN".to_string()));
+
+        let args_after_sep = vec![
+            "awb-rs".to_string(),
+            "--".to_string(),
+            "--lang".to_string(),
+            "de".to_string(),
+        ];
+        assert_eq!(extract_cli_lang(&args_after_sep), None);
+
+        let args_none = vec!["awb-rs".to_string(), "list".to_string()];
+        assert_eq!(extract_cli_lang(&args_none), None);
+
+        let args_missing_val = vec!["awb-rs".to_string(), "--lang".to_string()];
+        assert_eq!(extract_cli_lang(&args_missing_val), None);
+    }
+
+    #[test]
+    fn test_extract_cli_lang_os() {
+        use std::ffi::OsString;
+
+        let args = vec![
+            OsString::from("awb-rs"),
+            OsString::from("--lang"),
+            OsString::from("ja"),
+            OsString::from("--help"),
+        ];
+        assert_eq!(extract_cli_lang_os(&args), Some("ja".to_string()));
+
+        let args_eq = vec![OsString::from("awb-rs"), OsString::from("--lang=ar-EG")];
+        assert_eq!(extract_cli_lang_os(&args_eq), Some("ar-EG".to_string()));
+
+        let args_after_sep = vec![
+            OsString::from("awb-rs"),
+            OsString::from("--"),
+            OsString::from("--lang=de"),
+        ];
+        assert_eq!(extract_cli_lang_os(&args_after_sep), None);
+
+        let args_none = vec![OsString::from("awb-rs"), OsString::from("run")];
+        assert_eq!(extract_cli_lang_os(&args_none), None);
+
+        let args_missing_val = vec![OsString::from("awb-rs"), OsString::from("--lang")];
+        assert_eq!(extract_cli_lang_os(&args_missing_val), None);
+    }
+
+    #[cfg(unix)]
+    #[test]
+    fn test_extract_cli_lang_os_non_utf8_unix() {
+        use std::ffi::OsString;
+        use std::os::unix::ffi::OsStringExt;
+
+        let non_utf8 = OsString::from_vec(vec![b'f', b'o', b'o', 0xff, b'b', b'a', b'r']);
+
+        // Non-UTF-8 path argument before --lang is preserved/skipped cleanly
+        let args = vec![
+            OsString::from("awb-rs"),
+            non_utf8.clone(),
+            OsString::from("--lang"),
+            OsString::from("de"),
+        ];
+        assert_eq!(extract_cli_lang_os(&args), Some("de".to_string()));
+
+        // Non-UTF-8 value following --lang yields None without panicking
+        let args_bad_val = vec![OsString::from("awb-rs"), OsString::from("--lang"), non_utf8];
+        assert_eq!(extract_cli_lang_os(&args_bad_val), None);
+
+        // Non-UTF-8 --lang=<bytes> is skipped cleanly
+        let mut eq_bytes = b"--lang=".to_vec();
+        eq_bytes.push(0xfe);
+        let args_bad_eq = vec![OsString::from("awb-rs"), OsString::from_vec(eq_bytes)];
+        assert_eq!(extract_cli_lang_os(&args_bad_eq), None);
+    }
+
+    #[test]
+    fn test_detect_and_resolve_env() {
+        use std::sync::Mutex;
+
+        static ENV_LOCK: Mutex<()> = Mutex::new(());
+        const VARS: [&str; 4] = ["AWB_LANG", "LC_ALL", "LC_MESSAGES", "LANG"];
+
+        struct EnvGuard(Vec<(&'static str, Option<std::ffi::OsString>)>);
+        impl EnvGuard {
+            fn new() -> Self {
+                let saved = VARS
+                    .iter()
+                    .map(|&k| (k, std::env::var_os(k)))
+                    .collect::<Vec<_>>();
+                for &k in &VARS {
+                    // SAFETY: Serialized by ENV_LOCK within this unit test.
+                    unsafe { std::env::remove_var(k) };
+                }
+                Self(saved)
+            }
+            fn set(&self, key: &str, val: &str) {
+                // SAFETY: Serialized by ENV_LOCK within this unit test.
+                unsafe { std::env::set_var(key, val) };
+            }
+            fn remove(&self, key: &str) {
+                // SAFETY: Serialized by ENV_LOCK within this unit test.
+                unsafe { std::env::remove_var(key) };
+            }
+        }
+        impl Drop for EnvGuard {
+            fn drop(&mut self) {
+                for (k, v) in &self.0 {
+                    // SAFETY: Serialized by ENV_LOCK within this unit test.
+                    unsafe {
+                        match v {
+                            Some(val) => std::env::set_var(k, val),
+                            None => std::env::remove_var(k),
+                        }
+                    }
+                }
+            }
+        }
+
+        let _lock = ENV_LOCK.lock().expect("env lock poisoned");
+        let guard = EnvGuard::new();
+
+        // All unset -> English default
+        assert_eq!(Locale::detect(), Locale::En);
+        assert_eq!(Locale::resolve(None), Locale::En);
+
+        // LANG fallback when LC_ALL / LC_MESSAGES are unset
+        guard.set("LANG", "de_DE.UTF-8");
+        assert_eq!(Locale::detect(), Locale::De);
+
+        // Whitespace LC_ALL is ignored; LC_MESSAGES wins over LANG
+        guard.set("LC_ALL", "   ");
+        guard.set("LC_MESSAGES", "fr-SN-x-ma");
+        assert_eq!(Locale::detect(), Locale::FrSn);
+
+        // LC_ALL wins over LC_MESSAGES and LANG
+        guard.set("LC_ALL", "ar-EG-u-nu-latn");
+        assert_eq!(Locale::detect(), Locale::ArEg);
+
+        // Unknown LC_ALL falls back to English
+        guard.set("LC_ALL", "zz-UNKNOWN");
+        assert_eq!(Locale::detect(), Locale::En);
+
+        // Whitespace AWB_LANG falls through to detect()
+        guard.set("LC_ALL", "uk_UA.UTF-8");
+        guard.set("AWB_LANG", "  ");
+        assert_eq!(Locale::resolve(None), Locale::Uk);
+
+        // AWB_LANG takes precedence over POSIX variables
+        guard.set("AWB_LANG", "zh-Hans-HK");
+        assert_eq!(Locale::resolve(None), Locale::ZhCn);
+
+        // Unknown AWB_LANG falls back to English
+        guard.set("AWB_LANG", "xx-bad");
+        assert_eq!(Locale::resolve(None), Locale::En);
+
+        // Explicit CLI override wins over everything
+        assert_eq!(Locale::resolve(Some("zh-Hant-CN")), Locale::ZhTw);
+        assert_eq!(Locale::resolve(Some("xx-bad")), Locale::En);
+
+        guard.remove("AWB_LANG");
+        assert_eq!(Locale::resolve(None), Locale::Uk);
     }
 }

@@ -54,11 +54,11 @@ CLI → Xudunta → API → MediaWiki
 
 ## Luqadaha la Taageero
 
-Khadka taliska (CLI), warbixinnada bot-ka, iyo muuqaalka GTK4 waxay taageeraan 45 luqadood (oo ay ku jiraan 6 luqadood oo RTL ah: `ar`, `ar-EG`, `ar-MA`, `fa`, `he`, iyo `ur`). Gudbi `--lang <LANG>` ama deji `AWB_LANG` si aad u beddesho ogaanshaha luqadda nidaamka. Eeg [README.md](../../../README.md) si aad u aragto shaxda buuxda ee luqadaha.
+Khadka taliska (CLI), warbixinnada bot-ka, iyo muuqaalka GTK4 waxay taageeraan 45 luqadood (oo ay ku jiraan 6 luqadood oo RTL ah: `ar`, `ar-EG`, `ar-MA`, `fa`, `he`, iyo `ur`). Ku isticmaal `--lang <LANG>` khadka taliska (CLI), ama deji `AWB_LANG` ama doorsoomayaasha POSIX (`LC_ALL`/`LC_MESSAGES`/`LANG`) labadaba CLI iyo muuqaalka GTK4. Eeg [README.md](../../../README.md) si aad u aragto shaxda buuxda ee luqadaha.
 
 ## Shuruudaha Hore
 
-- **Rust**: Nooca 1.85 ama ka sareeya (MSRV)
+- **Rust**: Nooca 1.94 ama ka sareeya (MSRV)
 - **Cargo**: Waxay la timaaddaa ku-rakibidda Rust
 
 ## Ku-rakibidda
@@ -74,7 +74,7 @@ cd awb-rs
 cargo build --workspace --release
 
 # Ku rakib faylka la fulin karo
-cargo install --path awb-cli
+cargo install --path crates/awb_cli
 ```
 
 ## Horumarinta
@@ -239,7 +239,7 @@ end
 ### Kordhinta WebAssembly
 
 ```rust
-// U beddel WASM adigoo adeegsanaya: cargo build --target wasm32-wasi
+// U beddel WASM adigoo adeegsanaya: cargo build --target wasm32-wasip1
 #[no_mangle]
 pub extern "C" fn transform(content: &str) -> String {
     content.replace("foo", "bar")

@@ -54,11 +54,11 @@ CLI → কোর → API → MediaWiki
 
 ## সমর্থিত ভাষাসমূহ
 
-কমান্ড-লাইন ইন্টারফেস, বট প্রতিবেদন এবং GTK4 ইন্টারফেস ৪৫টি ভাষা সমর্থন করে (যার মধ্যে ৬টি ডান-থেকে-বাম লোকেল রয়েছে: `ar`, `ar-EG`, `ar-MA`, `fa`, `he`, এবং `ur`)। সিস্টেম লোকেল শনাক্তকরণ পরিবর্তন করতে `--lang <LANG>` ব্যবহার করুন অথবা `AWB_LANG` সেট করুন। সম্পূর্ণ ভাষার তালিকার জন্য [README.md](../../../README.md) দেখুন।
+কমান্ড-লাইন ইন্টারফেস, বট প্রতিবেদন এবং GTK4 ইন্টারফেস ৪৫টি ভাষা সমর্থন করে (যার মধ্যে ৬টি ডান-থেকে-বাম লোকেল রয়েছে: `ar`, `ar-EG`, `ar-MA`, `fa`, `he`, এবং `ur`)। CLI-তে `--lang <LANG>` ব্যবহার করুন, অথবা CLI ও GTK4 ইন্টারফেস উভয়ের জন্য `AWB_LANG` কিংবা POSIX লোকেল ভ্যারিয়েবল (`LC_ALL`/`LC_MESSAGES`/`LANG`) সেট করুন। সম্পূর্ণ ভাষার তালিকার জন্য [README.md](../../../README.md) দেখুন।
 
 ## পূর্বশর্তসমূহ
 
-- **Rust**: সংস্করণ ১.৮৫ বা তদূর্ধ্ব
+- **Rust**: সংস্করণ ১.৯৪ বা তদূর্ধ্ব
 - **Cargo**: Rust ইনস্টলেশনের সাথে অন্তর্ভুক্ত
 
 ## ইনস্টলেশন
@@ -74,7 +74,7 @@ cd awb-rs
 cargo build --workspace --release
 
 # বাইনারি ইনস্টল করুন
-cargo install --path awb-cli
+cargo install --path crates/awb_cli
 ```
 
 ## উন্নয়ন
@@ -239,7 +239,7 @@ end
 ### WebAssembly প্লাগইন
 
 ```rust
-// WASM-এ কম্পাইল করুন: cargo build --target wasm32-wasi
+// WASM-এ কম্পাইল করুন: cargo build --target wasm32-wasip1
 #[no_mangle]
 pub extern "C" fn transform(content: &str) -> String {
     content.replace("foo", "bar")

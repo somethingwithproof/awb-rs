@@ -54,11 +54,11 @@ CLI → コア → API → MediaWiki
 
 ## 対応言語
 
-CLI、ボットレポート、および GTK4 UI は 45 言語（6 つの RTL ロケール `ar`、`ar-EG`、`ar-MA`、`fa`、`he`、`ur` を含む）に対応しています。システムのロケール検出を上書きするには、`--lang <LANG>` を指定するか環境変数 `AWB_LANG` を設定してください。対応言語の一覧表については [README.md](../../../README.md) を参照してください。
+CLI、ボットレポート、および GTK4 UI は 45 言語（6 つの RTL ロケール `ar`、`ar-EG`、`ar-MA`、`fa`、`he`、`ur` を含む）に対応しています。CLI では `--lang <LANG>` を指定でき、CLI と GTK4 UI の両方では環境変数 `AWB_LANG` または POSIX ロケール変数（`LC_ALL`/`LC_MESSAGES`/`LANG`）を設定できます。対応言語の一覧表については [README.md](../../../README.md) を参照してください。
 
 ## 前提条件
 
-- **Rust**: バージョン 1.85 以上（MSRV）
+- **Rust**: バージョン 1.94 以上（MSRV）
 - **Cargo**: Rust のインストールに同梱
 
 ## インストール
@@ -74,7 +74,7 @@ cd awb-rs
 cargo build --workspace --release
 
 # バイナリをインストール
-cargo install --path awb-cli
+cargo install --path crates/awb_cli
 ```
 
 ## 開発
@@ -239,7 +239,7 @@ end
 ### WebAssembly プラグイン
 
 ```rust
-// WASM へのコンパイル: cargo build --target wasm32-wasi
+// WASM へのコンパイル: cargo build --target wasm32-wasip1
 #[no_mangle]
 pub extern "C" fn transform(content: &str) -> String {
     content.replace("foo", "bar")

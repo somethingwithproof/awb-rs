@@ -54,11 +54,11 @@ CLI → Cœur → API → MediaWiki
 
 ## Langues prises en charge
 
-La ligne de commande, les rapports de bot et l'interface GTK4 prennent en charge 45 langues (incluant 6 locales RTL : `ar`, `ar-EG`, `ar-MA`, `fa`, `he` et `ur`). Utilisez `--lang <LANG>` ou définissez `AWB_LANG` pour surcharger la détection de la langue du système. Reportez-vous à [README.md](../../../README.md) pour consulter le tableau complet des langues.
+La ligne de commande, les rapports de bot et l'interface GTK4 prennent en charge 45 langues (incluant 6 locales RTL : `ar`, `ar-EG`, `ar-MA`, `fa`, `he` et `ur`). Utilisez `--lang <LANG>` en ligne de commande, ou définissez `AWB_LANG` ou les variables POSIX (`LC_ALL`/`LC_MESSAGES`/`LANG`) pour la CLI et l'interface GTK4. Reportez-vous à [README.md](../../../README.md) pour consulter le tableau complet des langues.
 
 ## Prérequis
 
-- **Rust** : Version 1.85 ou ultérieure (MSRV)
+- **Rust** : Version 1.94 ou ultérieure (MSRV)
 - **Cargo** : Fourni avec l'installation de Rust
 
 ## Installation
@@ -74,7 +74,7 @@ cd awb-rs
 cargo build --workspace --release
 
 # Installer le binaire
-cargo install --path awb-cli
+cargo install --path crates/awb_cli
 ```
 
 ## Développement
@@ -239,7 +239,7 @@ end
 ### Plugins WebAssembly
 
 ```rust
-// Compiler en WASM avec : cargo build --target wasm32-wasi
+// Compiler en WASM avec : cargo build --target wasm32-wasip1
 #[no_mangle]
 pub extern "C" fn transform(content: &str) -> String {
     content.replace("foo", "bar")

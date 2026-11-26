@@ -54,11 +54,11 @@ CLI → هسته → API → MediaWiki
 
 ## زبان‌های پشتیبانی‌شده
 
-رابط خط فرمان، گزارش‌های ربات و رابط کاربری GTK4 از ۴۵ زبان پشتیبانی می‌کنند (از جمله ۶ زبان راست‌به‌چپ: `ar`، `ar-EG`، `ar-MA`، `fa`، `he` و `ur`). برای بازنویسی تشخیص خودکار زبان سیستم، گزینه `--lang <LANG>` را ارسال کنید یا متغیر `AWB_LANG` را تنظیم نمایید. برای مشاهده جدول کامل زبان‌ها به [README.md](../../../README.md) مراجعه کنید.
+رابط خط فرمان، گزارش‌های ربات و رابط کاربری GTK4 از ۴۵ زبان پشتیبانی می‌کنند (از جمله ۶ زبان راست‌به‌چپ: `ar`، `ar-EG`، `ar-MA`، `fa`، `he` و `ur`). در رابط خط فرمان (CLI) از گزینه `--lang <LANG>` استفاده کنید، یا برای هر دو رابط خط فرمان و رابط کاربری GTK4 متغیر `AWB_LANG` یا متغیرهای محلی POSIX (`LC_ALL`/`LC_MESSAGES`/`LANG`) را تنظیم نمایید. برای مشاهده جدول کامل زبان‌ها به [README.md](../../../README.md) مراجعه کنید.
 
 ## پیش‌نیازها
 
-- **Rust**: نسخه ۱.۸۵ یا بالاتر (حداقل نسخه پشتیبانی‌شده)
+- **Rust**: نسخه ۱.۹۴ یا بالاتر (حداقل نسخه پشتیبانی‌شده)
 - **Cargo**: همراه با نصب Rust ارائه می‌شود
 
 ## نصب
@@ -74,7 +74,7 @@ cd awb-rs
 cargo build --workspace --release
 
 # نصب فایل اجرایی
-cargo install --path awb-cli
+cargo install --path crates/awb_cli
 ```
 
 ## توسعه
@@ -239,7 +239,7 @@ end
 ### افزونه‌های WebAssembly
 
 ```rust
-// کامپایل به WASM با دستور: cargo build --target wasm32-wasi
+// کامپایل به WASM با دستور: cargo build --target wasm32-wasip1
 #[no_mangle]
 pub extern "C" fn transform(content: &str) -> String {
     content.replace("foo", "bar")

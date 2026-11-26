@@ -2,19 +2,26 @@
 // SPDX-License-Identifier: MIT
 
 use anyhow::{Context, Result};
-use awb_domain::i18n::{Locale, fmt1, fmt2};
-use awb_domain::profile::AuthMethod;
+use awb_domain::i18n::{Catalog, Locale, fmt1, fmt2};
 use awb_domain::types::Title;
 use awb_engine::diff_engine::{compute_diff, to_unified};
-use awb_mw_api::client::{EditRequest, MediaWikiClient, ReqwestMwClient};
-use awb_security::{CredentialPort, InMemoryCredentialStore};
-use awb_storage::TomlConfigStore;
+use awb_mw_api::client::{EditRequest, MediaWikiClient};
 use chrono::Utc;
 use console::style;
 use dialoguer::Select;
 use indicatif::{ProgressBar, ProgressStyle};
 use std::path::PathBuf;
 use url::Url;
+
+fn mode_label(batch: bool, dry_run: bool, cat: &Catalog) -> console::StyledObject<&'static str> {
+    if dry_run {
+        style(cat.mode_dry_run).yellow()
+    } else if batch {
+        style(cat.mode_batch).green()
+    } else {
+        style(cat.mode_interactive).cyan()
+    }
+}
 
 pub async fn run(
     wiki: Url,
@@ -25,62 +32,22 @@ pub async fn run(
     locale: Locale,
 ) -> Result<()> {
     let cat = locale.catalog();
-    println!("{}", style(cat.run_title).bold().cyan());
-    println!("{}: {}", cat.label_wiki, wiki);
-    println!("{}: {}", cat.label_profile, profile_path.display());
-    println!(
+    super::emit_stdout_line(&format!("{}", style(cat.run_title).bold().cyan()));
+    super::emit_stdout_line(&format!("{}: {}", cat.label_wiki, wiki));
+    super::emit_stdout_line(&format!(
+        "{}: {}",
+        cat.label_profile,
+        profile_path.display()
+    ));
+    super::emit_stdout_line(&format!(
         "{}: {}",
         cat.label_mode,
-        if dry_run {
-            style(cat.mode_dry_run).yellow()
-        } else if batch {
-            style(cat.mode_batch).green()
-        } else {
-            style(cat.mode_interactive).cyan()
-        }
-    );
-    println!();
+        mode_label(batch, dry_run, cat)
+    ));
+    super::emit_stdout_line("");
 
-    // Load profile
-    let config_store = TomlConfigStore::new(&profile_path);
-    let profile = config_store
-        .load_profile(&auth_profile)
-        .context(cat.err_load_profile)?;
-
-    // Get credentials
-    let cred_store = InMemoryCredentialStore::new();
-    let password = cred_store
-        .get_password(&auth_profile)
-        .context(cat.err_no_stored_creds)?;
-
-    // Create client and login
-    let client = ReqwestMwClient::new(wiki.clone(), profile.throttle_policy.clone())
-        .context(cat.err_create_http_client)?;
-
-    print!("{}", cat.msg_logging_in);
-    let username = match &profile.auth_method {
-        AuthMethod::BotPassword { username } => username.clone(),
-        AuthMethod::OAuth2 { .. } => {
-            anyhow::bail!("{}", cat.err_oauth2_unimplemented);
-        }
-        AuthMethod::OAuth1 { .. } => {
-            anyhow::bail!("{}", cat.err_oauth1_unimplemented);
-        }
-    };
-
-    client
-        .login_bot_password(&username, &password)
-        .await
-        .context(cat.err_login_failed)?;
-    println!("{}", style("✓").green().bold());
-
-    // Fetch CSRF token
-    print!("{}", cat.msg_fetching_csrf);
-    client
-        .fetch_csrf_token()
-        .await
-        .context(cat.err_fetch_csrf)?;
-    println!("{}", style("✓").green().bold());
+    let (client, _password) =
+        super::connect_authenticated_client(&wiki, &profile_path, &auth_profile, cat).await?;
 
     // For demo purposes, generate a simple page list
     // In real usage, this would come from the profile configuration
@@ -89,6 +56,16 @@ pub async fn run(
         Title::new(awb_domain::types::Namespace::MAIN, "Test Page 2"),
     ];
 
+    run_workflow(&client, batch, dry_run, &titles, cat).await
+}
+
+async fn run_workflow<C: MediaWikiClient>(
+    client: &C,
+    batch: bool,
+    dry_run: bool,
+    titles: &[Title],
+    cat: &Catalog,
+) -> Result<()> {
     println!();
     println!(
         "{}",
@@ -111,7 +88,7 @@ pub async fn run(
         pb.set_message(title.display.clone());
 
         // Fetch page
-        let page = match client.get_page(&title).await {
+        let page = match client.get_page(title).await {
             Ok(p) => p,
             Err(e) => {
                 pb.println(format!(
@@ -275,4 +252,102 @@ pub async fn run(
 fn apply_simple_transform(wikitext: &str) -> String {
     // Simple example transformation: fix double spaces
     wikitext.replace("  ", " ")
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use crate::commands::test_support::{MockMwClient, TestTempDir, write_test_profile};
+    use awb_domain::types::Namespace;
+
+    #[test]
+    fn test_mode_label_variants() {
+        for locale in [Locale::En, Locale::De] {
+            let cat = locale.catalog();
+            assert!(
+                mode_label(false, true, cat)
+                    .to_string()
+                    .contains(cat.mode_dry_run)
+            );
+            assert!(
+                mode_label(true, false, cat)
+                    .to_string()
+                    .contains(cat.mode_batch)
+            );
+            assert!(
+                mode_label(false, false, cat)
+                    .to_string()
+                    .contains(cat.mode_interactive)
+            );
+        }
+    }
+
+    #[test]
+    fn test_apply_simple_transform() {
+        assert_eq!(apply_simple_transform("Hello  world"), "Hello world");
+        assert_eq!(apply_simple_transform("No changes"), "No changes");
+    }
+
+    #[tokio::test]
+    async fn test_run_missing_profile_and_missing_creds() {
+        let tmp = TestTempDir::new("run");
+        let wiki = Url::parse("https://en.wikipedia.org/w/api.php").unwrap();
+
+        let missing = tmp.path().join("nonexistent.toml");
+        for (batch, dry_run, locale) in [
+            (false, true, Locale::En),
+            (true, false, Locale::De),
+            (false, false, Locale::Ja),
+        ] {
+            let cat = locale.catalog();
+            let err = run(
+                wiki.clone(),
+                missing.clone(),
+                batch,
+                dry_run,
+                "default".to_string(),
+                locale,
+            )
+            .await
+            .unwrap_err();
+            assert!(err.to_string().contains(cat.err_load_profile));
+        }
+
+        let valid = tmp.path().join("profiles.toml");
+        write_test_profile(&valid, "bot-main", &wiki);
+        let cat = Locale::Es.catalog();
+        let err = run(wiki, valid, false, true, "bot-main".to_string(), Locale::Es)
+            .await
+            .unwrap_err();
+        assert!(err.to_string().contains(cat.err_no_stored_creds));
+    }
+
+    #[tokio::test]
+    async fn test_run_workflow_dry_run_and_batch_with_mock_client() {
+        let mut client = MockMwClient::new();
+        client.add_page("Changed", "Line 1\nHello  world\nLine 3");
+        client.add_page("Unchanged", "Already clean");
+
+        let titles = vec![
+            Title::new(Namespace::MAIN, "Changed"),
+            Title::new(Namespace::MAIN, "Unchanged"),
+            Title::new(Namespace::MAIN, "Missing"),
+        ];
+
+        // Dry-run exercises diff rendering, no-change, fetch error, and dry-run skip
+        run_workflow(&client, false, true, &titles, Locale::De.catalog())
+            .await
+            .expect("dry-run workflow succeeds");
+
+        // Batch mode exercises auto-save success
+        run_workflow(&client, true, false, &titles, Locale::Ja.catalog())
+            .await
+            .expect("batch workflow succeeds");
+
+        // Batch mode with edit failure exercises failed save path
+        client.fail_edit = true;
+        run_workflow(&client, true, false, &titles, Locale::Fr.catalog())
+            .await
+            .expect("batch workflow handles edit error");
+    }
 }

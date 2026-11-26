@@ -54,11 +54,11 @@ CLI → النواة الأساسية → API → MediaWiki
 
 ## اللغات المدعومة
 
-واجهة سطر الأوامر (CLI) وتقارير البوت وواجهة GTK4 بتدعم 45 لغة (منهم 6 لغات RTL: `ar`، `ar-EG`، `ar-MA`، `fa`، `he`، و`ur`). تقدر تمرر `--lang <LANG>` أو تضبط متغير `AWB_LANG` علشان تتجاوز لغة النظام الافتراضية. شوف الجدول الكامل للغات في [README.md](../../../README.md).
+واجهة سطر الأوامر (CLI) وتقارير البوت وواجهة GTK4 بتدعم 45 لغة (منهم 6 لغات RTL: `ar`، `ar-EG`، `ar-MA`، `fa`، `he`، و`ur`). استخدم `--lang <LANG>` في واجهة سطر الأوامر (CLI)، أو اضبط `AWB_LANG` أو متغيرات POSIX (`LC_ALL`/`LC_MESSAGES`/`LANG`) لواجهة سطر الأوامر وواجهة GTK4 مع بعض. شوف الجدول الكامل للغات في [README.md](../../../README.md).
 
 ## المتطلبات الأساسية
 
-- **Rust**: إصدار 1.85 أو أحدث (MSRV)
+- **Rust**: إصدار 1.94 أو أحدث (MSRV)
 - **Cargo**: بيجي متثبت تلقائيًا مع Rust
 
 ## التثبيت
@@ -74,7 +74,7 @@ cd awb-rs
 cargo build --workspace --release
 
 # ثبّت البرنامج التنفيذي
-cargo install --path awb-cli
+cargo install --path crates/awb_cli
 ```
 
 ## التطوير
@@ -239,7 +239,7 @@ end
 ### إضافات WebAssembly
 
 ```rust
-// حوّل الكود لـ WASM بالأمر ده: cargo build --target wasm32-wasi
+// حوّل الكود لـ WASM بالأمر ده: cargo build --target wasm32-wasip1
 #[no_mangle]
 pub extern "C" fn transform(content: &str) -> String {
     content.replace("foo", "bar")

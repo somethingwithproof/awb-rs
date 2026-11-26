@@ -34,7 +34,7 @@ impl LoginDialog {
         preferences_group.add(&wiki_url_entry);
 
         // Username entry
-        let username_entry = adw::EntryRow::builder().title(cat.label_username).build();
+        let username_entry = adw::EntryRow::builder().title(cat.label_account).build();
         preferences_group.add(&username_entry);
 
         // Password entry

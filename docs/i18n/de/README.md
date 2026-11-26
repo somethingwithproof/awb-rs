@@ -54,13 +54,13 @@ CLI → Core → API → MediaWiki
 
 ## Unterstützte Sprachen
 
-Die CLI, Bot-Berichte und die GTK4-Benutzeroberfläche unterstützen 45 Sprachen (darunter 6 RTL-Locales: `ar`, `ar-EG`, `ar-MA`, `fa`, `he` und `ur`). Übergeben Sie `--lang <LANG>` oder setzen Sie `AWB_LANG`, um die automatische Erkennung der System-Locale zu überschreiben.
+Die CLI, Bot-Berichte und die GTK4-Benutzeroberfläche unterstützen 45 Sprachen (darunter 6 RTL-Locales: `ar`, `ar-EG`, `ar-MA`, `fa`, `he` und `ur`). Verwenden Sie `--lang <LANG>` in der CLI oder setzen Sie `AWB_LANG` bzw. POSIX-Locale-Variablen (`LC_ALL`/`LC_MESSAGES`/`LANG`) für die CLI und die GTK4-Benutzeroberfläche.
 
 Die vollständige Übersicht aller 45 unterstützten Sprachen sowie Links zu den jeweiligen lokalisierten Dokumentationen finden Sie in der englischen [README.md](../../../README.md).
 
 ## Voraussetzungen
 
-- **Rust**: Version 1.85 oder höher (MSRV)
+- **Rust**: Version 1.94 oder höher (MSRV)
 - **Cargo**: In der Rust-Installation enthalten
 
 ## Installation
@@ -76,7 +76,7 @@ cd awb-rs
 cargo build --workspace --release
 
 # Binärdatei installieren
-cargo install --path awb-cli
+cargo install --path crates/awb_cli
 ```
 
 ## Entwicklung
@@ -241,7 +241,7 @@ end
 ### WebAssembly-Plugins
 
 ```rust
-// Zu WASM kompilieren mit: cargo build --target wasm32-wasi
+// Zu WASM kompilieren mit: cargo build --target wasm32-wasip1
 #[no_mangle]
 pub extern "C" fn transform(content: &str) -> String {
     content.replace("foo", "bar")

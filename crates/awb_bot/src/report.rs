@@ -274,6 +274,25 @@ mod tests {
     }
 
     #[test]
+    fn test_bot_report_summary_localized_interrupted() {
+        let mut report = BotReport::new(Utc::now() - chrono::Duration::seconds(5));
+        report.record_page(create_test_result("Page1", PageAction::Edited));
+        report.record_page(create_test_result("Page2", PageAction::Errored));
+        report.finalize(false, Some("max edits reached".to_string()));
+
+        for locale in [awb_domain::i18n::Locale::De, awb_domain::i18n::Locale::Ja] {
+            let cat = locale.catalog();
+            let summary = report.to_summary_localized(locale);
+            assert!(summary.contains(cat.report_header));
+            assert!(summary.contains(cat.report_interrupted));
+            assert!(summary.contains(cat.report_reason));
+            assert!(summary.contains("max edits reached"));
+            assert!(summary.contains(cat.report_edit_rate));
+            assert!(summary.contains(cat.report_speed));
+        }
+    }
+
+    #[test]
     fn test_bot_report_json() {
         let mut report = BotReport::new(Utc::now());
         report.record_page(create_test_result("Test", PageAction::Edited));

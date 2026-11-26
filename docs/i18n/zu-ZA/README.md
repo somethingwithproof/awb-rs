@@ -54,11 +54,11 @@ CLI → Ingqikithi → API → MediaWiki
 
 ## Izilimi Ezisekelwayo
 
-I-CLI, imibiko ye-bot, nesixhumanisi se-GTK4 kusekela izilimi ezingama-45 (kufaka phakathi izilimi ezi-6 ze-RTL: `ar`, `ar-EG`, `ar-MA`, `fa`, `he`, kanye ne-`ur`). Sebenzisa `--lang <LANG>` noma usethe i-`AWB_LANG` ukuze ushintshe ukutholwa kolimi lwesistimu. Bheka ku-[README.md](../../../README.md) ukuze ubone ithebula eligcwele lezilimi.
+I-CLI, imibiko ye-bot, nesixhumanisi se-GTK4 kusekela izilimi ezingama-45 (kufaka phakathi izilimi ezi-6 ze-RTL: `ar`, `ar-EG`, `ar-MA`, `fa`, `he`, kanye ne-`ur`). Sebenzisa `--lang <LANG>` ku-CLI, noma usethe i-`AWB_LANG` noma okuguquguqukayo kwendawo ye-POSIX (`LC_ALL`/`LC_MESSAGES`/`LANG`) kukho kokubili i-CLI nesixhumanisi se-GTK4. Bheka ku-[README.md](../../../README.md) ukuze ubone ithebula eligcwele lezilimi.
 
 ## Izidingo Zokuqala
 
-- **Rust**: Inguqulo 1.85 noma ngaphezulu (MSRV)
+- **Rust**: Inguqulo 1.94 noma ngaphezulu (MSRV)
 - **Cargo**: Ifakiwe ekufakweni kwe-Rust
 
 ## Ukufakwa
@@ -74,7 +74,7 @@ cd awb-rs
 cargo build --workspace --release
 
 # Faka ifayela elisebenzayo
-cargo install --path awb-cli
+cargo install --path crates/awb_cli
 ```
 
 ## Ukuthuthukiswa
@@ -239,7 +239,7 @@ end
 ### Ama-Plugin e-WebAssembly
 
 ```rust
-// Hlanganisa uye ku-WASM nge: cargo build --target wasm32-wasi
+// Hlanganisa uye ku-WASM nge: cargo build --target wasm32-wasip1
 #[no_mangle]
 pub extern "C" fn transform(content: &str) -> String {
     content.replace("foo", "bar")

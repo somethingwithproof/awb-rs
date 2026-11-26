@@ -54,11 +54,11 @@ CLI → ליבה → API → MediaWiki
 
 ## שפות נתמכות
 
-ממשק שורת הפקודה, דוחות הבוט וממשק GTK4 תומכים ב-45 שפות (כולל 6 שפות מימין לשמאל: `ar`, `ar-EG`, `ar-MA`, `fa`, `he` ו-`ur`). העבירו `--lang <LANG>` או הגדירו את `AWB_LANG` כדי לעקוף את זיהוי השפה של המערכת. לטבלת השפות המלאה ראו [README.md](../../../README.md).
+ממשק שורת הפקודה, דוחות הבוט וממשק GTK4 תומכים ב-45 שפות (כולל 6 שפות מימין לשמאל: `ar`, `ar-EG`, `ar-MA`, `fa`, `he` ו-`ur`). השתמשו ב-`--lang <LANG>` ב-CLI, או הגדירו את `AWB_LANG` או משתני POSIX (`LC_ALL`/`LC_MESSAGES`/`LANG`) גם עבור ה-CLI וגם עבור ממשק GTK4. לטבלת השפות המלאה ראו [README.md](../../../README.md).
 
 ## דרישות מוקדמות
 
-- **Rust**: גרסה 1.85 ומעלה (גרסה נתמכת מזערית)
+- **Rust**: גרסה 1.94 ומעלה (גרסה נתמכת מזערית)
 - **Cargo**: כלול בהתקנת Rust
 
 ## התקנה
@@ -74,7 +74,7 @@ cd awb-rs
 cargo build --workspace --release
 
 # התקנת קובץ ההרצה
-cargo install --path awb-cli
+cargo install --path crates/awb_cli
 ```
 
 ## פיתוח
@@ -239,7 +239,7 @@ end
 ### תוספי WebAssembly
 
 ```rust
-// הידור ל-WASM באמצעות: cargo build --target wasm32-wasi
+// הידור ל-WASM באמצעות: cargo build --target wasm32-wasip1
 #[no_mangle]
 pub extern "C" fn transform(content: &str) -> String {
     content.replace("foo", "bar")

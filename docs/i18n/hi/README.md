@@ -54,11 +54,11 @@ CLI → कोर → API → MediaWiki
 
 ## समर्थित भाषाएँ
 
-कमांड-लाइन इंटरफ़ेस, बॉट रिपोर्ट और GTK4 इंटरफ़ेस 45 भाषाओं का समर्थन करते हैं (जिनमें 6 दाएँ-से-बाएँ लोकेल `ar`, `ar-EG`, `ar-MA`, `fa`, `he`, और `ur` शामिल हैं)। सिस्टम लोकेल पहचान को ओवरराइड करने के लिए `--lang <LANG>` पास करें या `AWB_LANG` सेट करें। संपूर्ण भाषा तालिका के लिए [README.md](../../../README.md) देखें।
+कमांड-लाइन इंटरफ़ेस, बॉट रिपोर्ट और GTK4 इंटरफ़ेस 45 भाषाओं का समर्थन करते हैं (जिनमें 6 दाएँ-से-बाएँ लोकेल `ar`, `ar-EG`, `ar-MA`, `fa`, `he`, और `ur` शामिल हैं)। CLI में `--lang <LANG>` का उपयोग करें, या CLI और GTK4 इंटरफ़ेस दोनों के लिए `AWB_LANG` अथवा POSIX लोकेल चर (`LC_ALL`/`LC_MESSAGES`/`LANG`) सेट करें। संपूर्ण भाषा तालिका के लिए [README.md](../../../README.md) देखें।
 
 ## पूर्वापेक्षाएँ
 
-- **Rust**: संस्करण 1.85 या उससे उच्चतर
+- **Rust**: संस्करण 1.94 या उससे उच्चतर
 - **Cargo**: Rust इंस्टॉलेशन के साथ सम्मिलित
 
 ## इंस्टॉलेशन
@@ -74,7 +74,7 @@ cd awb-rs
 cargo build --workspace --release
 
 # बाइनरी इंस्टॉल करें
-cargo install --path awb-cli
+cargo install --path crates/awb_cli
 ```
 
 ## विकास
@@ -239,7 +239,7 @@ end
 ### WebAssembly प्लगइन
 
 ```rust
-// WASM में संकलित करने के लिए: cargo build --target wasm32-wasi
+// WASM में संकलित करने के लिए: cargo build --target wasm32-wasip1
 #[no_mangle]
 pub extern "C" fn transform(content: &str) -> String {
     content.replace("foo", "bar")

@@ -54,11 +54,11 @@ CLI → Fototra → API → MediaWiki
 
 ## Fiteny tohanana
 
-Ny CLI, ny tatitry ny baoty, ary ny fifandraisana GTK4 dia manohana fiteny 45 (anisan'izany ny fiteny RTL 6: `ar`, `ar-EG`, `ar-MA`, `fa`, `he`, ary `ur`). Ampiasao ny `--lang <LANG>` na ovay ny `AWB_LANG` mba hanoloana ny fiteny hita ho azy avy amin'ny rafitra. Jereo ny [README.md](../../../README.md) ho an'ny tabilao feno momba ny fiteny.
+Ny CLI, ny tatitry ny baoty, ary ny fifandraisana GTK4 dia manohana fiteny 45 (anisan'izany ny fiteny RTL 6: `ar`, `ar-EG`, `ar-MA`, `fa`, `he`, ary `ur`). Ampiasao ny `--lang <LANG>` ao amin'ny CLI, na apetraho ny `AWB_LANG` na ny fari-piteny POSIX (`LC_ALL`/`LC_MESSAGES`/`LANG`) ho an'ny CLI sy ny fifandraisana GTK4. Jereo ny [README.md](../../../README.md) ho an'ny tabilao feno momba ny fiteny.
 
 ## Fepetra ilaina
 
-- **Rust**: Kinova 1.85 na ambony kokoa (MSRV)
+- **Rust**: Kinova 1.94 na ambony kokoa (MSRV)
 - **Cargo**: Miaraka amin'ny fametrahana Rust
 
 ## Fametrahana
@@ -74,7 +74,7 @@ cd awb-rs
 cargo build --workspace --release
 
 # Mametraka ny programa azo ampiasaina
-cargo install --path awb-cli
+cargo install --path crates/awb_cli
 ```
 
 ## Fampandrosoana
@@ -239,7 +239,7 @@ end
 ### Plugin WebAssembly
 
 ```rust
-// Manangona ho WASM amin'ny: cargo build --target wasm32-wasi
+// Manangona ho WASM amin'ny: cargo build --target wasm32-wasip1
 #[no_mangle]
 pub extern "C" fn transform(content: &str) -> String {
     content.replace("foo", "bar")

@@ -54,11 +54,11 @@ CLI → மைய அடுக்கு → API → MediaWiki
 
 ## ஆதரிக்கப்படும் மொழிகள்
 
-CLI, தானியங்கி அறிக்கைகள் மற்றும் GTK4 பயனர் இடைமுகம் ஆகியவை 45 மொழிகளை ஆதரிக்கின்றன (இதில் 6 RTL மொழிகள் அடங்கும்: `ar`, `ar-EG`, `ar-MA`, `fa`, `he`, மற்றும் `ur`). கணினி மொழியமைப்பு கண்டறிதலை மேலெழுத `--lang <LANG>` அளவுருவை வழங்கவும் அல்லது `AWB_LANG` மாறியை அமைக்கவும். முழு மொழி அட்டவணைக்கு [README.md](../../../README.md) கோப்பைப் பார்க்கவும்.
+CLI, தானியங்கி அறிக்கைகள் மற்றும் GTK4 பயனர் இடைமுகம் ஆகியவை 45 மொழிகளை ஆதரிக்கின்றன (இதில் 6 RTL மொழிகள் அடங்கும்: `ar`, `ar-EG`, `ar-MA`, `fa`, `he`, மற்றும் `ur`). CLI இல் `--lang <LANG>` ஐப் பயன்படுத்தவும், அல்லது CLI மற்றும் GTK4 பயனர் இடைமுகம் இரண்டிற்கும் `AWB_LANG` அல்லது POSIX மொழியமைப்பு மாறிகளை (`LC_ALL`/`LC_MESSAGES`/`LANG`) அமைக்கவும். முழு மொழி அட்டவணைக்கு [README.md](../../../README.md) கோப்பைப் பார்க்கவும்.
 
 ## முன்நிபந்தனைகள்
 
-- **Rust**: பதிப்பு 1.85 அல்லது அதற்கு மேற்பட்டது (MSRV)
+- **Rust**: பதிப்பு 1.94 அல்லது அதற்கு மேற்பட்டது (MSRV)
 - **Cargo**: Rust நிறுவலுடன் இணைந்து வருகிறது
 
 ## நிறுவல்
@@ -74,7 +74,7 @@ cd awb-rs
 cargo build --workspace --release
 
 # இயக்கக் கோப்பை நிறுவவும்
-cargo install --path awb-cli
+cargo install --path crates/awb_cli
 ```
 
 ## உருவாக்கம்
@@ -239,7 +239,7 @@ end
 ### WebAssembly செருகுநிரல்கள்
 
 ```rust
-// WASM ஆகத் தொகுக்க: cargo build --target wasm32-wasi
+// WASM ஆகத் தொகுக்க: cargo build --target wasm32-wasip1
 #[no_mangle]
 pub extern "C" fn transform(content: &str) -> String {
     content.replace("foo", "bar")
