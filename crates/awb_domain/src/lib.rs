@@ -2,6 +2,7 @@
 // SPDX-License-Identifier: MIT
 
 pub mod diff;
+pub mod i18n;
 pub mod profile;
 pub mod rules;
 pub mod session;

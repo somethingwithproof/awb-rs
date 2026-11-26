@@ -1,6 +1,7 @@
 // SPDX-FileCopyrightText: 2026 Thomas Vincent <thomasvincent@gmail.com>
 // SPDX-License-Identifier: MIT
 
+use awb_domain::i18n::Locale;
 use gtk::prelude::*;
 
 pub struct EditorView {
@@ -15,6 +16,7 @@ pub struct EditorView {
 
 impl EditorView {
     pub fn new() -> Self {
+        let cat = Locale::resolve(None).catalog();
         let container = gtk::Box::builder()
             .orientation(gtk::Orientation::Vertical)
             .vexpand(true)
@@ -40,7 +42,10 @@ impl EditorView {
             .hexpand(true)
             .build();
 
-        notebook.append_page(&source_scroll, Some(&gtk::Label::new(Some("Source"))));
+        notebook.append_page(
+            &source_scroll,
+            Some(&gtk::Label::new(Some(cat.gtk_tab_source))),
+        );
 
         // Diff view tab (split pane)
         let diff_paned = gtk::Paned::builder()
@@ -67,7 +72,7 @@ impl EditorView {
         let before_box = gtk::Box::builder()
             .orientation(gtk::Orientation::Vertical)
             .build();
-        before_box.append(&gtk::Label::new(Some("Before (Original)")));
+        before_box.append(&gtk::Label::new(Some(cat.gtk_diff_before)));
         before_box.append(&before_scroll);
         diff_paned.set_start_child(Some(&before_box));
 
@@ -90,11 +95,11 @@ impl EditorView {
         let after_box = gtk::Box::builder()
             .orientation(gtk::Orientation::Vertical)
             .build();
-        after_box.append(&gtk::Label::new(Some("After (Modified)")));
+        after_box.append(&gtk::Label::new(Some(cat.gtk_diff_after)));
         after_box.append(&after_scroll);
         diff_paned.set_end_child(Some(&after_box));
 
-        notebook.append_page(&diff_paned, Some(&gtk::Label::new(Some("Diff View"))));
+        notebook.append_page(&diff_paned, Some(&gtk::Label::new(Some(cat.gtk_tab_diff))));
 
         container.append(&notebook);
 
